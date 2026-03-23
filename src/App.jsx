@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 
 const TEAM_NUM="115",TEAM_KEY="frc115",EVENT_KEY="2026caoec",NEXUS_EVENT="2026caoec";
 const DEMO_TBA_EVENT="2025capin",DEMO_TBA_TEAM="frc115";
@@ -13,6 +13,14 @@ const ANNOUNCE_KEY="frc115_announce_v1";
 const ISSUES_KEY="frc115_issues_v1";
 const DIR_PIN_KEY="frc115_dir_pin_v1";
 const DEFAULT_PIN="1028";
+
+// Inject global keyframes for shake animation
+if(typeof document!=="undefined"){
+  const s=document.createElement("style");
+  s.textContent="@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}";
+  document.head.appendChild(s);
+}
+
 const HARDCODED_NEXUS_KEY="rVnKYGMmwYp7N-GlkYvywj0_iPs";
 
 const PC={
@@ -183,7 +191,7 @@ async function upsSet(k,v){
     await fetch(`${UPS_URL}/set/${encodeURIComponent(k)}`,{
       method:"POST",
       headers:{Authorization:`Bearer ${UPS_TOKEN}`,"Content-Type":"application/json"},
-      body:JSON.stringify(JSON.stringify(v))});
+      body:JSON.stringify(v)});
   }catch(e){console.warn("Upstash write failed:",e.message);}
 }
 
@@ -734,7 +742,7 @@ function PinScreen({onUnlock,activePin}){
     else{setShake(true);setPin("");setTimeout(()=>setShake(false),500);}};
   return(
     <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#0d0520,#1e0a3c)",display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
-      <style>{`@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}`}</style>
+
       <div style={{background:"rgba(255,255,255,.04)",border:"1px solid rgba(139,92,246,.3)",borderRadius:20,padding:32,maxWidth:300,width:"100%",boxShadow:"0 24px 60px rgba(80,0,180,.3)",animation:shake?"shake .4s ease":"none"}}>
         <div style={{textAlign:"center",marginBottom:24}}>
           <div style={{fontSize:40,marginBottom:8}}>🔐</div>
@@ -1078,6 +1086,26 @@ function DirectorShell({onLock,onPinChange}){
 
 
 
+
+// Error boundary to catch runtime crashes and show them instead of blank screen
+class ErrorBoundary extends React.Component {
+  constructor(props){super(props);this.state={error:null};}
+  static getDerivedStateFromError(e){return{error:e};}
+  componentDidCatch(e,info){console.error("App crashed:",e,info);}
+  render(){
+    if(this.state.error)return(
+      <div style={{padding:32,fontFamily:"monospace",background:"#1e0a3c",color:"#f87171",minHeight:"100vh"}}>
+        <div style={{fontSize:18,fontWeight:700,marginBottom:12}}>⚠️ App Error</div>
+        <div style={{fontSize:12,whiteSpace:"pre-wrap",wordBreak:"break-all"}}>{String(this.state.error)}</div>
+        <button onClick={()=>this.setState({error:null})}
+          style={{marginTop:16,padding:"8px 16px",background:"#7e22ce",color:"white",border:"none",borderRadius:8,cursor:"pointer"}}>
+          Retry
+        </button>
+      </div>);
+    return this.props.children;
+  }
+}
+
 export default function App(){
   const [tab,setTab]=useState("checklist");
   const [nexusData,setNexusData]=useState(null);
@@ -1164,8 +1192,8 @@ export default function App(){
   },[nexusData,tbaMatches]);
 
   // Director / PIN gates
-  if(directorMode) return <DirectorShell onLock={()=>setDirectorMode(false)} onPinChange={p=>setActivePin(p)}/>;
-  if(showPinPrompt) return <PinScreen activePin={activePin} onUnlock={()=>{setDirectorMode(true);setShowPinPrompt(false);}}/>;
+  if(directorMode) return <ErrorBoundary><DirectorShell onLock={()=>setDirectorMode(false)} onPinChange={p=>setActivePin(p)}/></ErrorBoundary>;
+  if(showPinPrompt) return <ErrorBoundary><PinScreen activePin={activePin} onUnlock={()=>{setDirectorMode(true);setShowPinPrompt(false);}}/></ErrorBoundary>;
 
   const TABS=[{id:"checklist",label:"📋 Checklist"},{id:"schedule",label:"🏆 Schedule"},{id:"archive",label:"🗂 Archive"},{id:"info",label:"ℹ️ Info"}];
 
