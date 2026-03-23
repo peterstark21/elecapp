@@ -12,7 +12,7 @@ const DEMO_ARCHIVE_KEY="frc115_archive_demo_v5";
 const ANNOUNCE_KEY="frc115_announce_v1";
 const ISSUES_KEY="frc115_issues_v1";
 const DIR_PIN_KEY="frc115_dir_pin_v1";
-const DEFAULT_PIN="3721";
+const DEFAULT_PIN="1028";
 const HARDCODED_NEXUS_KEY="rVnKYGMmwYp7N-GlkYvywj0_iPs";
 
 const PC={
@@ -197,16 +197,19 @@ async function upsSet(k, v) {
 }
 
 const ls = async (k) => {
-  // Return memory cache instantly, then hydrate from remote in background
-  if (_mem[k] !== undefined) return _mem[k];
-  // Try localStorage first (fast, offline fallback)
-  try { const lv = localStorage.getItem(k); if (lv) { _mem[k] = JSON.parse(lv); } } catch {}
-  // Fetch from Upstash if configured and key needs sync
+  // For shared keys always fetch fresh from Upstash — never use stale cache
   if (UPS_URL && needsSync(k)) {
     const rv = await upsGet(k);
-    if (rv !== null) { _mem[k] = rv; try { localStorage.setItem(k, JSON.stringify(rv)); } catch {} return rv; }
+    if (rv !== null) {
+      _mem[k] = rv;
+      try { localStorage.setItem(k, JSON.stringify(rv)); } catch {}
+      return rv;
+    }
   }
-  return _mem[k] ?? null;
+  // Fallback: memory cache then localStorage
+  if (_mem[k] !== undefined) return _mem[k];
+  try { const lv = localStorage.getItem(k); if (lv) { _mem[k] = JSON.parse(lv); return _mem[k]; } } catch {}
+  return null;
 };
 
 const ss = async (k, v) => {
@@ -552,7 +555,7 @@ function ChecklistTab({nexusData,tbaMatches,autoMatch,demoMode}){
   const sKey=useCallback(()=>matchNum?`${STORAGE_KEY}:${matchNum}`:STORAGE_KEY,[matchNum]);
   const loadState=useCallback(async()=>{const d=await ls(sKey());if(d?.checked)setChecked(d.checked);},[sKey]);
   useEffect(()=>{loadState();},[loadState]);
-  useEffect(()=>{syncRef.current=setInterval(loadState,10000);return()=>clearInterval(syncRef.current);},[loadState]);
+  useEffect(()=>{syncRef.current=setInterval(loadState,3000);return()=>clearInterval(syncRef.current);},[loadState]);
   const toggle=useCallback(async id=>{setChecked(prev=>{const next={...prev,[id]:!prev[id]};ss(sKey(),{checked:next,updatedBy:lead||"unknown",updatedAt:Date.now()});return next;});},[sKey,lead]);
   const doMarkAll=async()=>{const all=ALL_IDS.reduce((a,id)=>({...a,[id]:true}),{});setChecked(all);await ss(sKey(),{checked:all,updatedBy:lead||"unknown",updatedAt:Date.now()});setMarkAll(false);};
   const doReset=async()=>{setChecked({});setMsg("");await ss(sKey(),{checked:{},updatedBy:lead||"unknown",updatedAt:Date.now()});};
@@ -705,7 +708,7 @@ function AnnouncementBanner(){
   const [ann,setAnn]=useState([]);
   useEffect(()=>{
     const poll=()=>ls(ANNOUNCE_KEY).then(d=>setAnn(d||[]));
-    poll();const t=setInterval(poll,15000);return()=>clearInterval(t);
+    poll();const t=setInterval(poll,3000);return()=>clearInterval(t);
   },[]);
   if(!ann.length)return null;
   const latest=ann[ann.length-1];
@@ -790,7 +793,7 @@ function DirectorMonitor(){
   const [liveData,setLiveData]=useState({});
   const [archive,setArchive]=useState([]);
   const [tick,setTick]=useState(0);
-  useEffect(()=>{const t=setInterval(()=>setTick(x=>x+1),8000);return()=>clearInterval(t);},[]);
+  useEffect(()=>{const t=setInterval(()=>setTick(x=>x+1),3000);return()=>clearInterval(t);},[]);
   useEffect(()=>{
     const poll=async()=>{
       const data={};
@@ -1192,8 +1195,6 @@ export default function App(){
 
   const TABS=[{id:"checklist",label:"📋 Checklist"},{id:"schedule",label:"🏆 Schedule"},{id:"archive",label:"🗂 Archive"},{id:"info",label:"ℹ️ Info"}];
 
-  if(directorMode) return <DirectorShell onLock={()=>setDirectorMode(false)} onPinChange={p=>setActivePin(p)}/>;
-  if(showPinPrompt) return <PinScreen activePin={activePin} onUnlock={()=>{setDirectorMode(true);setShowPinPrompt(false);}}/>;
   return(<div style={{fontFamily:"'Segoe UI',Arial,sans-serif",background:"#f1f5f9",minHeight:"100vh",maxWidth:600,margin:"0 auto"}}>
     <div style={{background:"linear-gradient(135deg,#1e0a3c 0%,#2d1b69 60%,#1a1f5e 100%)",color:"white",padding:"14px 14px 12px",boxShadow:"0 4px 12px rgba(0,0,0,.3)"}}>
       <div style={{display:"flex",alignItems:"center",gap:10}}>
