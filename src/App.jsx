@@ -159,67 +159,46 @@ const ALL_ITEMS=SECTIONS.flatMap(s=>s.items);
 const ALL_IDS=ALL_ITEMS.map(i=>i.id);
 const CRIT_ITEMS=ALL_ITEMS.filter(i=>i.priority==="CRITICAL");
 
-// ── UPSTASH REDIS: true cross-device sync ─────────────────────────────────────
-const UPS_URL   = "https://real-goshawk-81449.upstash.io"; // paste UPSTASH_REDIS_REST_URL here
-const UPS_TOKEN = "gQAAAAAAAT4pAAIncDFmNThjN2Y3OGZhZmI0YTBhYmNiMzJmZDE3N2NiMjNlYXAxODE0NDk"; // paste UPSTASH_REDIS_REST_TOKEN here
+// ── Upstash Redis: true cross-device sync ────────────────────────────────────
+const UPS_URL   = "https://real-goshawk-81449.upstash.io";
+const UPS_TOKEN = "gQAAAAAAAT4pAAIncDFmNThjN2Y3OGZhZmI0YTBhYmNiMzJmZDE3N2NiMjNlYXAxODE0NDk";
 
-// Keys that sync across devices (all shared checklist data)
-const SYNC_PREFIXES = [STORAGE_KEY, ARCHIVE_KEY, DEMO_ARCHIVE_KEY, ANNOUNCE_KEY];
-const needsSync = k => SYNC_PREFIXES.some(p => k === p || k.startsWith(p + ":"));
+const SYNC_KEYS=[STORAGE_KEY,ARCHIVE_KEY,DEMO_ARCHIVE_KEY,ANNOUNCE_KEY];
+const needsSync=k=>SYNC_KEYS.some(p=>k===p||k.startsWith(p+":"));
 
-// Local cache so UI stays fast
-const _mem = {};
-// BroadcastChannel for instant same-device tab sync
-const _bc = typeof BroadcastChannel !== "undefined" ? new BroadcastChannel("frc115") : null;
-if(_bc) _bc.onmessage = e => { _mem[e.data.k] = e.data.v; };
+const _bc=typeof BroadcastChannel!=="undefined"?new BroadcastChannel("frc115"):null;
 
-async function upsGet(k) {
-  try {
-    const r = await fetch(`${UPS_URL}/get/${encodeURIComponent(k)}`, {
-      headers: { Authorization: `Bearer ${UPS_TOKEN}` }, cache: "no-store"
-    });
-    if (!r.ok) return null;
-    const j = await r.json();
-    if (j.result == null) return null;
-    return JSON.parse(j.result);
-  } catch { return null; }
+async function upsGet(k){
+  try{
+    const r=await fetch(`${UPS_URL}/get/${encodeURIComponent(k)}`,{
+      headers:{Authorization:`Bearer ${UPS_TOKEN}`},cache:"no-store"});
+    if(!r.ok)return null;
+    const j=await r.json();
+    return j.result==null?null:JSON.parse(j.result);
+  }catch{return null;}
 }
 
-async function upsSet(k, v) {
-  const s = JSON.stringify(v);
-  try {
-    await fetch(`${UPS_URL}/set/${encodeURIComponent(k)}`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${UPS_TOKEN}`, "Content-Type": "application/json" },
-      body: JSON.stringify(s)
-    });
-  } catch(e) { console.warn("Upstash write failed:", e.message); }
+async function upsSet(k,v){
+  try{
+    await fetch(`${UPS_URL}/set/${encodeURIComponent(k)}`,{
+      method:"POST",
+      headers:{Authorization:`Bearer ${UPS_TOKEN}`,"Content-Type":"application/json"},
+      body:JSON.stringify(JSON.stringify(v))});
+  }catch(e){console.warn("Upstash write failed:",e.message);}
 }
 
-const ls = async (k) => {
-  // For shared keys always fetch fresh from Upstash — never use stale cache
-  if (UPS_URL && needsSync(k)) {
-    const rv = await upsGet(k);
-    if (rv !== null) {
-      _mem[k] = rv;
-      try { localStorage.setItem(k, JSON.stringify(rv)); } catch {}
-      return rv;
-    }
+const ls=async(k)=>{
+  if(needsSync(k)){
+    const v=await upsGet(k);
+    if(v!==null){try{localStorage.setItem(k,JSON.stringify(v));}catch{}return v;}
   }
-  // Fallback: memory cache then localStorage
-  if (_mem[k] !== undefined) return _mem[k];
-  try { const lv = localStorage.getItem(k); if (lv) { _mem[k] = JSON.parse(lv); return _mem[k]; } } catch {}
-  return null;
+  try{const v=localStorage.getItem(k);return v?JSON.parse(v):null;}catch{return null;}
 };
 
-const ss = async (k, v) => {
-  _mem[k] = v;
-  // Write to localStorage as offline fallback
-  try { localStorage.setItem(k, JSON.stringify(v)); } catch {}
-  // Broadcast to other tabs on same device
-  _bc && _bc.postMessage({ k, v });
-  // Write to Upstash for cross-device sync
-  if (UPS_URL && needsSync(k)) await upsSet(k, v);
+const ss=async(k,v)=>{
+  try{localStorage.setItem(k,JSON.stringify(v));}catch{}
+  _bc&&_bc.postMessage({k,v});
+  if(needsSync(k))await upsSet(k,v);
 };
 
 async function sendEmail(mLabel,leadName,completed,total,quickMode){
@@ -723,32 +702,27 @@ function AnnouncementBanner(){
 
 
 function SyncStatus(){
-  const [status, setStatus] = useState(UPS_URL ? "checking" : "local");
-  useEffect(() => {
-    if (!UPS_URL) { setStatus("local"); return; }
-    const check = async () => {
-      try {
-        const r = await fetch(`${UPS_URL}/ping`, {
-          headers: { Authorization: `Bearer ${UPS_TOKEN}` }
-        });
-        const j = await r.json();
-        setStatus(j.result === "PONG" ? "synced" : "error");
-      } catch { setStatus("error"); }
+  const [status,setStatus]=useState("checking");
+  useEffect(()=>{
+    const check=async()=>{
+      try{
+        const r=await fetch(`${UPS_URL}/ping`,{headers:{Authorization:`Bearer ${UPS_TOKEN}`}});
+        const j=await r.json();
+        setStatus(j.result==="PONG"?"synced":"error");
+      }catch{setStatus("error");}
     };
-    check(); const t = setInterval(check, 30000); return () => clearInterval(t);
-  }, []);
-  const cfg = {
-    synced:   { dot: "#4ade80", glow: "0 0 5px #4ade80", txt: "Live Sync ✓" },
-    checking: { dot: "#fbbf24", glow: undefined,          txt: "Connecting…" },
-    local:    { dot: "#fbbf24", glow: undefined,          txt: "Local only" },
-    error:    { dot: "#f87171", glow: undefined,          txt: "Sync Error" },
-  }[status] || { dot: "#94a3b8", txt: "…" };
-  return (
-    <div style={{ fontSize: 10, display: "flex", alignItems: "center", gap: 4, color: "#94a3b8", marginTop: 1 }}>
-      <div style={{ width: 6, height: 6, borderRadius: "50%", flexShrink: 0, background: cfg.dot, boxShadow: cfg.glow }} />
+    check();const t=setInterval(check,30000);return()=>clearInterval(t);
+  },[]);
+  const cfg={
+    synced:{dot:"#4ade80",glow:"0 0 5px #4ade80",txt:"Live Sync ✓"},
+    checking:{dot:"#fbbf24",glow:undefined,txt:"Connecting…"},
+    error:{dot:"#f87171",glow:undefined,txt:"Sync Error"},
+  }[status]||{dot:"#94a3b8",txt:"…"};
+  return(
+    <div style={{fontSize:10,display:"flex",alignItems:"center",gap:4,color:"#94a3b8",marginTop:1}}>
+      <div style={{width:6,height:6,borderRadius:"50%",flexShrink:0,background:cfg.dot,boxShadow:cfg.glow}}/>
       <span>Pre-Queue · 2026 OC · {cfg.txt}</span>
-    </div>);
-}
+    </div>);}
 
 // ── ANNOUNCEMENT BANNER ───────────────────────────────────────────────────────
 
