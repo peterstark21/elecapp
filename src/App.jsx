@@ -361,7 +361,7 @@ async function sendEmail(mLabel,leadName,div,completed,total,quickMode){
     const ctrl=new AbortController();
     const t=setTimeout(()=>ctrl.abort(),10000);
     try{
-      const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json","Origin":"https://claude.ai"},body:JSON.stringify(payload),signal:ctrl.signal});
+      const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload),signal:ctrl.signal});
       if(!r.ok){
         const msg=await r.text().catch(()=>"");
         console.warn("EmailJS non-OK response",{
