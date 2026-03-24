@@ -289,6 +289,7 @@ const getCritItems = (div) => getAllItems(div).filter(i=>i.priority==="CRITICAL"
 const fmtTime = ms=>!ms?"TBD":new Date(ms).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
 const fmtDate = ms=>!ms?"":new Date(ms).toLocaleDateString([],{weekday:"short",month:"short",day:"numeric"});
 const fmtDT   = ms=>!ms?"":new Date(ms).toLocaleString([],{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
+const asArray = (v)=>Array.isArray(v)?v:[];
 const fmtCD   = ms=>{const s=Math.abs(ms)/1000,h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sc=Math.floor(s%60);
   return h>0?`${h}h ${String(m).padStart(2,"0")}m ${String(sc).padStart(2,"0")}s`:`${String(m).padStart(2,"0")}m ${String(sc).padStart(2,"0")}s`;};
 const getTS = m=>m?.predicted_time||m?.time||null;
@@ -392,7 +393,7 @@ function SyncStatus(){
 function AnnouncementBanner(){
   const [ann,setAnn]=useState([]);
   useEffect(()=>{
-    const poll=()=>ls(SK.announce).then(d=>setAnn(d||[]));
+    const poll=()=>ls(SK.announce).then(d=>setAnn(asArray(d)));
     poll();const t=setInterval(poll,3000);return()=>clearInterval(t);
   },[]);
   if(!ann.length)return null;
@@ -940,7 +941,7 @@ function ArchiveTab({div,demoMode}){
     const k=demoMode?"frc115_arch_demo_v6":divCfg.archKey;
     ls(k).then(d=>{
       // Filter to only this division
-      const filtered=(d||[]).filter(e=>!e.division||e.division===div);
+      const filtered=asArray(d).filter(e=>!e.division||e.division===div);
       setArchive(filtered);setLoading(false);
     });
   },[div,demoMode,divCfg.archKey]);
@@ -1140,7 +1141,7 @@ function DivisionMonitorPanel({div,archive}){
   },[tick,divCfg.storKey]);
 
   const activeKeys=Object.keys(liveData).filter(k=>liveData[k]?.checked&&Object.keys(liveData[k].checked).length>0);
-  const divArch=(archive||[]).filter(e=>e.division===div||!e.division&&div==="elec");
+  const divArch=asArray(archive).filter(e=>e.division===div||!e.division&&div==="elec");
   const totalSubs=divArch.length;
   const avgPct=totalSubs?Math.round(divArch.reduce((a,e)=>a+Math.round(e.completedCount/allItems.length*100),0)/totalSubs):0;
   const critMisses=divArch.filter(e=>!critItems.every(i=>(e.checkedIds||[]).includes(i.id)));
@@ -1253,7 +1254,7 @@ function DirectorMonitor({archive}){
 // ── DIRECTOR: ANNOUNCEMENTS ───────────────────────────────────────────────────
 function DirectorAnnouncements(){
   const [ann,setAnn]=useState([]);const [text,setText]=useState("");const [urgency,setUrgency]=useState("info");
-  useEffect(()=>{const poll=()=>ls(SK.announce).then(d=>setAnn(d||[]));poll();const t=setInterval(poll,5000);return()=>clearInterval(t);},[]);
+  useEffect(()=>{const poll=()=>ls(SK.announce).then(d=>setAnn(asArray(d)));poll();const t=setInterval(poll,5000);return()=>clearInterval(t);},[]);
   const push=async()=>{if(!text.trim())return;const a=[...ann,{id:Date.now(),text:text.trim(),urgency,time:Date.now()}];setAnn(a);await ss(SK.announce,a);setText("");};
   const remove=async(id)=>{const a=ann.filter(x=>x.id!==id);setAnn(a);await ss(SK.announce,a);};
   const clearAll=async()=>{setAnn([]);await ss(SK.announce,[]);};
@@ -1294,7 +1295,7 @@ function DirectorAnnouncements(){
 function DirectorIssues(){
   const [issues,setIssues]=useState([]);const [match,setMatch]=useState("");const [sev,setSev]=useState("medium");
   const [comp,setComp]=useState("");const [desc,setDesc]=useState("");const [isDiv,setIsDiv]=useState("elec");
-  useEffect(()=>{const poll=()=>ls(SK.issues).then(d=>setIssues(d||[]));poll();const t=setInterval(poll,10000);return()=>clearInterval(t);},[]);
+  useEffect(()=>{const poll=()=>ls(SK.issues).then(d=>setIssues(asArray(d)));poll();const t=setInterval(poll,10000);return()=>clearInterval(t);},[]);
   const save=async()=>{if(!desc.trim())return;const list=[...issues,{match,sev,comp,desc:desc.trim(),div:isDiv,id:Date.now(),time:Date.now()}];setIssues(list);await ss(SK.issues,list);setMatch("");setComp("");setDesc("");};
   const remove=async(id)=>{const l=issues.filter(x=>x.id!==id);setIssues(l);await ss(SK.issues,l);};
   const SEV={high:{col:T.red,bg:"rgba(248,113,113,.12)",label:"🔴 HIGH"},medium:{col:T.amber,bg:"rgba(251,146,60,.12)",label:"🟠 MEDIUM"},low:{col:T.purL,bg:"rgba(196,181,253,.12)",label:"🟢 LOW"}};
@@ -1509,7 +1510,7 @@ function DirectorApp({onBack,onPinChange,activePin,demoMode,onToggleDemo}){
   useEffect(()=>{
     const loadArch=async()=>{
       const [e,m,s]= await Promise.all([ls(SK.archElec),ls(SK.archMech),ls(SK.archSW)]);
-      setArchive({elec:e||[],mech:m||[],sw:s||[]});};
+      setArchive({elec:asArray(e),mech:asArray(m),sw:asArray(s)});};
     loadArch();const t=setInterval(loadArch,5000);return()=>clearInterval(t);
   },[]);
 
@@ -1580,7 +1581,7 @@ export default function App(){
   useEffect(()=>{
     const loadArch=async()=>{
       const [e,m,s]=await Promise.all([ls(SK.archElec),ls(SK.archMech),ls(SK.archSW)]);
-      setArchive({elec:e||[],mech:m||[],sw:s||[]});};
+      setArchive({elec:asArray(e),mech:asArray(m),sw:asArray(s)});};
     loadArch();const t=setInterval(loadArch,10000);return()=>clearInterval(t);
   },[]);
 
