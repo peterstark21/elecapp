@@ -443,7 +443,7 @@ function HomePage({onLeadMode,onDirectorMode,archive}){
             <span style={{fontSize:36}}>🤖</span>
           </div>
           <div style={{fontSize:13,fontWeight:700,color:T.purL,letterSpacing:3,textTransform:"uppercase",marginBottom:4}}>MVRT Team 115</div>
-          <div style={{fontSize:28,fontWeight:900,color:T.text,letterSpacing:.5,marginBottom:4}}>Pit CheckList App</div>
+          <div style={{fontSize:28,fontWeight:900,color:T.text,letterSpacing:.5,marginBottom:4}}>Pit Checklist App</div>
           <div style={{fontSize:13,color:T.textD,marginBottom:20}}>{EVENT_NAME} · {EVENT_DATES} · {EVENT_LOCATION}</div>
 
           {/* Event countdown */}
