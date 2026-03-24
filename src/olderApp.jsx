@@ -38,15 +38,8 @@ const SYNC_KEYS = Object.values(SK);
 // ── UPSTASH ───────────────────────────────────────────────────────────────────
 const UPS_URL   = "https://real-goshawk-81449.upstash.io";
 const UPS_TOKEN = "gQAAAAAAAT4pAAIncDFmNThjN2Y3OGZhZmI0YTBhYmNiMzJmZDE3N2NiMjNlYXAxODE0NDk";
-const _wt = {}; // write timestamps — declared here so _bc.onmessage can reference them
-const _lc = {}; // local value cache
 let _bc = null;
-try {
-  _bc = new BroadcastChannel("frc115");
-  _bc.onmessage = (e) => {
-    if(e.data?.k){ _wt[e.data.k]=Date.now(); _lc[e.data.k]=e.data.v; }
-  };
-} catch {}
+try { _bc = new BroadcastChannel("frc115"); } catch {}
 
 async function upsGet(k) {
   try {
@@ -68,24 +61,14 @@ async function upsSet(k, v) {
   } catch(e) { console.warn("Upstash write failed:", e.message); }
 }
 
-// Write-lock: after a local write, use localStorage for 8s so a slow Upstash
-// round-trip can't overwrite fresh local data with a stale value.
-
 const ls = async (k) => {
-  const isSync = SYNC_KEYS.some(p => k === p || k.startsWith(p + ":"));
-  if (isSync) {
-    // If we wrote this key within the last 8 seconds, trust local cache
-    if (_wt[k] && Date.now() - _wt[k] < 8000) {
-      try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : (_lc[k] ?? null); } catch { return _lc[k] ?? null; }
-    }
+  if (SYNC_KEYS.some(p => k === p || k.startsWith(p + ":"))) {
     const v = await upsGet(k);
     if (v !== null) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} return v; }
   }
   try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch { return null; }
 };
 const ss = async (k, v) => {
-  _wt[k] = Date.now(); // stamp the write
-  _lc[k] = v;          // cache locally
   try { localStorage.setItem(k, JSON.stringify(v)); } catch {}
   _bc && _bc.postMessage({ k, v });
   if (SYNC_KEYS.some(p => k === p || k.startsWith(p + ":"))) await upsSet(k, v);
@@ -351,7 +334,6 @@ function nexusSS(status){if(!status)return null;const s=status.toLowerCase();
 async function sendEmail(mLabel,leadName,div,completed,total,quickMode){
   const url="https://api.emailjs.com/api/v1.0/email/send";
   const payload={service_id:EJS_SERVICE,template_id:EJS_TEMPLATE,user_id:EJS_PUBKEY,
-    accessToken:EJS_PUBKEY,
     template_params:{to_email:NOTIFY_EMAIL,team_number:"115",match_label:mLabel,
       lead_name:`${leadName||"Unknown"} (${div})`,completed:String(completed),total:String(total),
       submitted_time:new Date().toLocaleTimeString(),event:EVENT_NAME,
@@ -361,7 +343,7 @@ async function sendEmail(mLabel,leadName,div,completed,total,quickMode){
     const ctrl=new AbortController();
     const t=setTimeout(()=>ctrl.abort(),10000);
     try{
-      const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json","Origin":"https://claude.ai"},body:JSON.stringify(payload),signal:ctrl.signal});
+      const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload),signal:ctrl.signal});
       if(!r.ok){
         const msg=await r.text().catch(()=>"");
         console.warn("EmailJS non-OK response",{
