@@ -333,12 +333,16 @@ function nexusSS(status){if(!status)return null;const s=status.toLowerCase();
 async function sendEmail(mLabel,leadName,div,completed,total,quickMode){
   try{
     const r=await fetch("https://api.emailjs.com/api/v1.0/email/send",{
-      method:"POST",headers:{"Content-Type":"application/json","Origin":"https://claude.ai"},
-      body:JSON.stringify({service_id:EJS_SERVICE,template_id:EJS_TEMPLATE,user_id:EJS_PUBKEY,accessToken:EJS_PUBKEY,
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({service_id:EJS_SERVICE,template_id:EJS_TEMPLATE,user_id:EJS_PUBKEY,
         template_params:{to_email:NOTIFY_EMAIL,team_number:"115",match_label:mLabel,
           lead_name:`${leadName||"Unknown"} (${div})`,completed:String(completed),total:String(total),
           submitted_time:new Date().toLocaleTimeString(),event:EVENT_NAME,
           method:quickMode?"Quick Complete":"Manual"}})});
+    if(!r.ok){
+      const msg=await r.text().catch(()=>"");
+      console.warn("EmailJS non-OK response:", r.status, msg);
+    }
     return r.ok;
   }catch(e){console.warn("Email failed:",e);return false;}}
 
@@ -515,7 +519,7 @@ function HomePage({onLeadMode,onDirectorMode,archive}){
               <div style={{fontSize:17,fontWeight:800,color:T.text,marginBottom:3}}>Director Mode</div>
               <div style={{fontSize:12,color:T.textD,lineHeight:1.5}}>Monitor all divisions, push announcements, and manage the event — PIN required</div>
             </div>
-            <span style={{fontSize:16,padding:"4px 8px",borderRadius:8,background:"rgba(147,51,234,.2)",color:T.purL,fontWeight:700,fontSize:10}}>🔐 PIN</span>
+            <span style={{padding:"4px 8px",borderRadius:8,background:"rgba(147,51,234,.2)",color:T.purL,fontWeight:700,fontSize:10}}>🔐 PIN</span>
           </div>
         </button>
       </div>
