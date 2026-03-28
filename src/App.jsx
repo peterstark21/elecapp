@@ -367,29 +367,24 @@ const MECH_SECTIONS = [
 ];
 
 const SW_SECTIONS = [
-  { id: "sw_boot", title: "💻 Boot & Comms", color: "#2563eb", bg: "#eff6ff", items: [
-    { id: "sw1", priority: "CRITICAL", text: "Robot code deployed and running — DS shows robot enabled", note: "Check Driver Station status indicators" },
-    { id: "sw2", priority: "CRITICAL", text: "All subsystems initialized — no null pointer or startup errors in DS log", note: "Check FRC Driver Station message log" },
-    { id: "sw3", priority: "CRITICAL", text: "NetworkTables connected — Shuffleboard/Glass showing live data", note: "Required for vision and dashboard monitoring" },
+  { id: "sw_swerve", title: "🌀 Swerve", color: "#2563eb", bg: "#eff6ff", items: [
+    { id: "sw1", priority: "CRITICAL", text: "Left joystick all 4 directions — swerve follows correctly", note: "Push left joystick up/down/left/right and verify wheels drive in matching direction" },
+    { id: "sw2", priority: "CRITICAL", text: "Right joystick rotate — swerve rotates and goes in circles", note: "Rotate right joystick; robot should spin in place smoothly" },
+    { id: "sw3", priority: "CRITICAL", text: "Both joysticks simultaneously — no weird sounds, directions followed", note: "Drive and rotate at the same time; listen for grinding or stalling" },
   ]},
-  { id: "sw_auto", title: "🤖 Autonomous", color: "#7c3aed", bg: "#faf5ff", items: [
-    { id: "sw4", priority: "CRITICAL", text: "Correct autonomous routine selected for this match", note: "Verify with drive team before queue" },
-    { id: "sw5", priority: "CRITICAL", text: "Starting position set and verified on field", note: "Robot starting pose must match auto routine" },
-    { id: "sw6", priority: "HIGH", text: "Autonomous ran successfully in last practice", note: "If not tested this session, flag to drive team" },
+  { id: "sw_intake", title: "🔄 Intake", color: "#7c3aed", bg: "#faf5ff", items: [
+    { id: "sw4", priority: "CRITICAL", text: "Roller by itself (right bumper) — nothing stalled", note: "Hold right bumper; rollers should spin freely with no jamming" },
+    { id: "sw5", priority: "CRITICAL", text: "Raise intake up (left dpad) — goes up to target position", note: "Press left dpad; intake arm should reach its upper setpoint cleanly" },
   ]},
-  { id: "sw_vision", title: "📷 Vision & Localization", color: "#0891b2", bg: "#ecfeff", items: [
-    { id: "sw7", priority: "CRITICAL", text: "Limelight pipeline active and returning valid targets", note: "Check NetworkTables for tv/tx/ty values" },
-    { id: "sw8", priority: "HIGH", text: "Pose estimation within expected field bounds", note: "Check odometry on Shuffleboard" },
-    { id: "sw9", priority: "HIGH", text: "No vision pipeline errors in DS log", note: null },
-  ]},
-  { id: "sw_teleop", title: "🕹️ Teleop", color: "#059669", bg: "#ecfdf5", items: [
-    { id: "sw10", priority: "CRITICAL", text: "Full systems check passed — all driver controls verified", note: "Run through every button binding with driver" },
-    { id: "sw11", priority: "CRITICAL", text: "Drive team confirmed controller layout and all bindings correct", note: null },
-    { id: "sw12", priority: "HIGH", text: "No persistent error messages in Driver Station", note: "Yellow/red DS messages = investigate" },
+  { id: "sw_shooter", title: "🎯 Shooter + Hopper", color: "#0891b2", bg: "#ecfeff", items: [
+    { id: "sw6", priority: "CRITICAL", text: "Rev empty shooter (left bumper) — flywheels and back index rollers rotate", note: "Hold left bumper with no game piece; confirm flywheels spin up and index rollers move" },
+    { id: "sw7", priority: "CRITICAL", text: "Revving to shooting transition (left bumper + right trigger) — all motors run, intake oscillates", note: "Hold left bumper then pull right trigger; all shooter flywheels, index motors, and intake should activate" },
+    { id: "sw8", priority: "HIGH", text: "AprilTag targeting — shooter and hopper motors run when target acquired", note: "Place AprilTag in front of camera; verify all shooter/hopper motors spin given a target" },
+    { id: "sw9", priority: "HIGH", text: "Swerve auto-aligns based on AprilTag position", note: "With AprilTag visible, check if swerve adjusts heading toward the target" },
   ]},
   { id: "sw_signoff", title: "✅ Software Sign-Off", color: "#1f2937", bg: "#f8fafc", items: [
-    { id: "sw13", priority: "CRITICAL", text: "Software lead has confirmed robot code is ready to compete", note: null },
-    { id: "sw14", priority: "HIGH", text: "Drive team is aware of any software limitations this match", note: null },
+    { id: "sw10", priority: "CRITICAL", text: "Software lead has confirmed robot code is ready to compete", note: null },
+    { id: "sw11", priority: "HIGH", text: "Drive team is aware of any software limitations this match", note: null },
   ]},
 ];
 
