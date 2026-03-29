@@ -31,7 +31,7 @@ const CONFIG = {
     token: "gQAAAAAAAT4pAAIncDFmNThjN2Y3OGZhZmI0YTBhYmNiMzJmZDE3N2NiMjNlYXAxODE0NDk",
   },
   defaultPin: "1028",
-  youtubeStreamUrl: "", // paste YouTube livestream URL when available
+  youtubeStreamUrl: "https://www.youtube.com/watch?v=eeGYe9lUGLk", // paste YouTube livestream URL when available
 };
 
 // ╔══════════════════════════════════════════════════════════════════════════════╗
@@ -344,52 +344,70 @@ const ELEC_SECTIONS = [
 ];
 
 const MECH_SECTIONS = [
-  { id: "mech_general", title: "🔧 General Mechanical", color: "#059669", bg: "#ecfdf5", items: [
-    { id: "mg1", priority: "CRITICAL", text: "[PLACEHOLDER] Full mechanical checklist coming soon", note: "Awaiting checklist from mechanical lead" },
-    { id: "mg2", priority: "HIGH", text: "All fasteners checked for tightness after last match", note: null },
-    { id: "mg3", priority: "HIGH", text: "No cracked or broken structural components", note: null },
-    { id: "mg4", priority: "HIGH", text: "All mechanisms operate through full range of motion", note: null },
-  ]},
   { id: "mech_drivetrain", title: "🌀 Drivetrain", color: "#0d9488", bg: "#f0fdfa", items: [
-    { id: "md1", priority: "CRITICAL", text: "[PLACEHOLDER] Drivetrain mechanical checks coming soon", note: null },
-    { id: "md2", priority: "HIGH", text: "All wheel modules spin freely — no binding", note: null },
-    { id: "md3", priority: "HIGH", text: "No debris caught in drivetrain", note: null },
+    { id: "md1", priority: "HIGH", text: "Turn wheels to see if they run smooth", note: "Spin each module by hand; no grinding or resistance" },
+    { id: "md2", priority: "HIGH", text: "Check for carpet burrs and other dirt on swerve modules", note: "Clean out any debris caught in modules" },
+    { id: "md3", priority: "HIGH", text: "Swerve belts — check tension and condition", note: "No fraying, correct tension" },
+    { id: "md4", priority: "HIGH", text: "Treads — inspect for wear and damage", note: null },
+    { id: "md5", priority: "MEDIUM", text: "Drivetrain screws + nuts tight", note: null },
   ]},
-  { id: "mech_mechanisms", title: "⚙️ Game Mechanisms", color: "#7c3aed", bg: "#faf5ff", items: [
-    { id: "mm1", priority: "CRITICAL", text: "[PLACEHOLDER] Game mechanism checks coming soon", note: null },
-    { id: "mm2", priority: "HIGH", text: "All pneumatic connections secure (if applicable)", note: null },
-    { id: "mm3", priority: "MEDIUM", text: "Game piece handler inspected for damage", note: null },
+  { id: "mech_intake", title: "🔄 Intake", color: "#7c3aed", bg: "#faf5ff", items: [
+    { id: "mi1", priority: "HIGH", text: "Pivot up and down — full range of motion", note: "Manually move intake through range; no binding" },
+    { id: "mi2", priority: "HIGH", text: "Chain tension on pivot", note: "Check for slack; adjust if needed" },
+    { id: "mi3", priority: "HIGH", text: "Bearings — spin freely, no play", note: null },
+    { id: "mi4", priority: "HIGH", text: "Sprockets — teeth intact, no wear", note: null },
+    { id: "mi5", priority: "HIGH", text: "Intake roller — spins freely, no damage", note: null },
+    { id: "mi6", priority: "HIGH", text: "Roller hubs — secure, no wobble", note: null },
+    { id: "mi7", priority: "MEDIUM", text: "Intake screws + nuts tight", note: null },
+    { id: "mi8", priority: "HIGH", text: "Screw on kickerbar secure", note: null },
+    { id: "mi9", priority: "HIGH", text: "Pulleys — aligned, no wobble", note: null },
+    { id: "mi10", priority: "HIGH", text: "Belt tension correct", note: null },
+    { id: "mi11", priority: "MEDIUM", text: "Check 3D printed parts for cracks or damage", note: "Replace any cracked prints" },
+    { id: "mi12", priority: "MEDIUM", text: "Check metal bar (if bent)", note: "Straighten or replace if deformed" },
+  ]},
+  { id: "mech_hopper", title: "📦 Hopper", color: "#059669", bg: "#ecfdf5", items: [
+    { id: "mh1", priority: "HIGH", text: "Both side belts secure to the pulleys", note: "Check left and right belt attachment" },
+    { id: "mh2", priority: "HIGH", text: "All belt tensions correct", note: null },
+    { id: "mh3", priority: "MEDIUM", text: "Netting — intact, no tears or loose points", note: null },
+    { id: "mh4", priority: "MEDIUM", text: "Hopper screws + nuts tight", note: null },
+  ]},
+  { id: "mech_shooter", title: "🎯 Shooter", color: "#be185d", bg: "#fdf2f8", items: [
+    { id: "ms1", priority: "HIGH", text: "Bearings — spin freely, no play", note: null },
+    { id: "ms2", priority: "HIGH", text: "Belt tensions correct", note: null },
+    { id: "ms3", priority: "HIGH", text: "Grip tape ends — secure, not peeling", note: "Re-wrap any loose tape" },
+    { id: "ms4", priority: "HIGH", text: "Flywheels — spin freely, no wobble", note: null },
+    { id: "ms5", priority: "HIGH", text: "Feeder wheels — spin freely, no damage", note: null },
+    { id: "ms6", priority: "HIGH", text: "Sprockets — teeth intact, aligned", note: null },
+    { id: "ms7", priority: "HIGH", text: "Chains — correct tension, no skipping", note: null },
+  ]},
+  { id: "mech_limelight", title: "📷 Limelight Mount", color: "#166534", bg: "#f0fdf4", items: [
+    { id: "ml1", priority: "HIGH", text: "Limelight mounting screws + nuts tight", note: "Camera angle shift corrupts targeting" },
   ]},
   { id: "mech_signoff", title: "✅ Mechanical Sign-Off", color: "#1f2937", bg: "#f8fafc", items: [
-    { id: "ms1", priority: "CRITICAL", text: "Mechanical lead has verified robot is ready to compete", note: null },
-    { id: "ms2", priority: "HIGH", text: "All safety pins and locks removed before enable", note: null },
+    { id: "mso1", priority: "CRITICAL", text: "Mechanical lead has verified robot is ready to compete", note: null },
+    { id: "mso2", priority: "HIGH", text: "All safety pins and locks removed before enable", note: null },
   ]},
 ];
 
 const SW_SECTIONS = [
-  { id: "sw_boot", title: "💻 Boot & Comms", color: "#2563eb", bg: "#eff6ff", items: [
-    { id: "sw1", priority: "CRITICAL", text: "Robot code deployed and running — DS shows robot enabled", note: "Check Driver Station status indicators" },
-    { id: "sw2", priority: "CRITICAL", text: "All subsystems initialized — no null pointer or startup errors in DS log", note: "Check FRC Driver Station message log" },
-    { id: "sw3", priority: "CRITICAL", text: "NetworkTables connected — Shuffleboard/Glass showing live data", note: "Required for vision and dashboard monitoring" },
+  { id: "sw_swerve", title: "🌀 Swerve", color: "#2563eb", bg: "#eff6ff", items: [
+    { id: "sw1", priority: "CRITICAL", text: "Left joystick all 4 directions — swerve follows correctly", note: "Push left joystick up/down/left/right and verify wheels drive in matching direction" },
+    { id: "sw2", priority: "CRITICAL", text: "Right joystick rotate — swerve rotates and goes in circles", note: "Rotate right joystick; robot should spin in place smoothly" },
+    { id: "sw3", priority: "CRITICAL", text: "Both joysticks simultaneously — no weird sounds, directions followed", note: "Drive and rotate at the same time; listen for grinding or stalling" },
   ]},
-  { id: "sw_auto", title: "🤖 Autonomous", color: "#7c3aed", bg: "#faf5ff", items: [
-    { id: "sw4", priority: "CRITICAL", text: "Correct autonomous routine selected for this match", note: "Verify with drive team before queue" },
-    { id: "sw5", priority: "CRITICAL", text: "Starting position set and verified on field", note: "Robot starting pose must match auto routine" },
-    { id: "sw6", priority: "HIGH", text: "Autonomous ran successfully in last practice", note: "If not tested this session, flag to drive team" },
+  { id: "sw_intake", title: "🔄 Intake", color: "#7c3aed", bg: "#faf5ff", items: [
+    { id: "sw4", priority: "CRITICAL", text: "Roller by itself (right bumper) — nothing stalled", note: "Hold right bumper; rollers should spin freely with no jamming" },
+    { id: "sw5", priority: "CRITICAL", text: "Raise intake up (left dpad) — goes up to target position", note: "Press left dpad; intake arm should reach its upper setpoint cleanly" },
   ]},
-  { id: "sw_vision", title: "📷 Vision & Localization", color: "#0891b2", bg: "#ecfeff", items: [
-    { id: "sw7", priority: "CRITICAL", text: "Limelight pipeline active and returning valid targets", note: "Check NetworkTables for tv/tx/ty values" },
-    { id: "sw8", priority: "HIGH", text: "Pose estimation within expected field bounds", note: "Check odometry on Shuffleboard" },
-    { id: "sw9", priority: "HIGH", text: "No vision pipeline errors in DS log", note: null },
-  ]},
-  { id: "sw_teleop", title: "🕹️ Teleop", color: "#059669", bg: "#ecfdf5", items: [
-    { id: "sw10", priority: "CRITICAL", text: "Full systems check passed — all driver controls verified", note: "Run through every button binding with driver" },
-    { id: "sw11", priority: "CRITICAL", text: "Drive team confirmed controller layout and all bindings correct", note: null },
-    { id: "sw12", priority: "HIGH", text: "No persistent error messages in Driver Station", note: "Yellow/red DS messages = investigate" },
+  { id: "sw_shooter", title: "🎯 Shooter + Hopper", color: "#0891b2", bg: "#ecfeff", items: [
+    { id: "sw6", priority: "CRITICAL", text: "Rev empty shooter (left bumper) — flywheels and back index rollers rotate", note: "Hold left bumper with no game piece; confirm flywheels spin up and index rollers move" },
+    { id: "sw7", priority: "CRITICAL", text: "Revving to shooting transition (left bumper + right trigger) — all motors run, intake oscillates", note: "Hold left bumper then pull right trigger; all shooter flywheels, index motors, and intake should activate" },
+    { id: "sw8", priority: "HIGH", text: "AprilTag targeting — shooter and hopper motors run when target acquired", note: "Place AprilTag in front of camera; verify all shooter/hopper motors spin given a target" },
+    { id: "sw9", priority: "HIGH", text: "Swerve auto-aligns based on AprilTag position", note: "With AprilTag visible, check if swerve adjusts heading toward the target" },
   ]},
   { id: "sw_signoff", title: "✅ Software Sign-Off", color: "#1f2937", bg: "#f8fafc", items: [
-    { id: "sw13", priority: "CRITICAL", text: "Software lead has confirmed robot code is ready to compete", note: null },
-    { id: "sw14", priority: "HIGH", text: "Drive team is aware of any software limitations this match", note: null },
+    { id: "sw10", priority: "CRITICAL", text: "Software lead has confirmed robot code is ready to compete", note: null },
+    { id: "sw11", priority: "HIGH", text: "Drive team is aware of any software limitations this match", note: null },
   ]},
 ];
 
@@ -596,32 +614,123 @@ async function sendEmail(mLabel, leadName, div, completed, total, quickMode) {
 // ║  SECTION 10: DEMO MODE DATA                                                  ║
 // ╚═══════════════════════════════════════════════════════════════════════���══════╝
 
+// Demo mode: realistic comp simulation with configurable speed
+// _demoAnchor stores the real-world timestamp when demo was started/reset
+// _demoSpeed controls how fast time flows (1 = real-time, 4 = 4x speed, etc.)
+let _demoAnchor = null;
+let _demoSpeed = 4; // default 4x speed so a full comp runs in ~30 min
+
+function getDemoNow() {
+  if (!_demoAnchor) _demoAnchor = Date.now();
+  return _demoAnchor + (Date.now() - _demoAnchor) * _demoSpeed;
+}
+
+function resetDemoAnchor() { _demoAnchor = Date.now(); }
+function setDemoSpeed(s) { _demoSpeed = Math.max(1, Math.min(20, s)); }
+function getDemoSpeed() { return _demoSpeed; }
+
 function buildMockNexus() {
-  const now = Date.now(), min = 60000;
+  const now = getDemoNow(), min = 60000;
+  // Team 115 appears in quals 1, 4, 7, 10, 13, 16, and playoffs
   const TM = new Set([1, 4, 7, 10, 13, 16]);
-  const F = [
-    ["330", "2910", "3538", "1323", "4255", "6036"],
-    ["4150", "2984", "5507", "6418", "3255", "1678"],
-  ];
-  const matches = Array.from({ length: 18 }, (_, i) => {
+  // Pool of realistic FRC team numbers for alliance partners/opponents
+  const POOL_A = ["254", "1678", "2910", "3538", "4255", "6036", "971", "1323"];
+  const POOL_B = ["330", "2984", "5507", "6418", "3255", "4150", "118", "148"];
+
+  // Build 18 qual matches — every ~7 min apart, with queuing 14 min before
+  const qualCount = 18;
+  const matchGap = 7 * min; // 7 min between matches
+  const firstMatchStart = _demoAnchor + 5 * min; // first match 5 min after demo starts
+
+  const quals = Array.from({ length: qualCount }, (_, i) => {
     const q = i + 1;
-    const startMs = now + 10 * min + 14 * min + i * 7 * min;
-    const h = TM.has(q);
-    const red = h ? (q % 2 === 0 ? ["115", "254", "1678"] : ["115", "3538", "4255"]) : [F[0][i % 6], F[1][i % 6], F[0][(i + 2) % 6]];
-    const blue = h ? (q % 2 === 0 ? ["330", "2910", "6036"] : ["330", "2910", "1323"]) : [F[1][(i + 1) % 6], F[0][(i + 3) % 6], F[1][(i + 4) % 6]];
-    const qAt = startMs - 14 * min, odAt = startMs - 6 * min, ofAt = startMs - 2 * min;
+    const startMs = firstMatchStart + i * matchGap;
+    const has115 = TM.has(q);
+
+    // Build realistic alliances — shuffle partners each time
+    const redTeams = has115
+      ? ["115", POOL_A[i % POOL_A.length], POOL_A[(i + 3) % POOL_A.length]]
+      : [POOL_A[i % POOL_A.length], POOL_B[i % POOL_B.length], POOL_A[(i + 2) % POOL_A.length]];
+    const blueTeams = has115
+      ? [POOL_B[i % POOL_B.length], POOL_B[(i + 2) % POOL_B.length], POOL_B[(i + 4) % POOL_B.length]]
+      : [POOL_B[(i + 1) % POOL_B.length], POOL_A[(i + 4) % POOL_A.length], POOL_B[(i + 3) % POOL_B.length]];
+
+    // Alternate which side 115 is on
+    const finalRed = has115 && q % 2 === 0 ? blueTeams : redTeams;
+    const finalBlue = has115 && q % 2 === 0 ? redTeams : blueTeams;
+
+    const qAt = startMs - 14 * min;
+    const odAt = startMs - 6 * min;
+    const ofAt = startMs - 2 * min;
+
     let st = "Scheduled";
-    if (startMs < now - 2 * min) st = "Complete";
+    if (now > startMs + 3 * min) st = "Complete";
     else if (now >= ofAt) st = "On Field";
     else if (now >= odAt) st = "On Deck";
     else if (now >= qAt) st = "Now Queuing";
+
     return {
-      label: `Qualification ${q}`, status: st, redTeams: red, blueTeams: blue,
+      label: `Qualification ${q}`, status: st,
+      redTeams: finalRed, blueTeams: finalBlue,
       times: { estimatedQueueTime: qAt, estimatedOnDeckTime: odAt, estimatedOnFieldTime: ofAt, estimatedStartTime: startMs },
     };
   });
-  const qm = matches.find(m => m.status === "Now Queuing");
-  return { eventKey: "demo", dataAsOfTime: now, nowQueuing: qm?.label || null, matches, announcements: [], partsRequests: [] };
+
+  // Add playoff matches after quals (115 always in playoffs)
+  const playoffStart = firstMatchStart + qualCount * matchGap + 10 * min;
+  const playoffMatches = [
+    { label: "Playoff 1", red: ["115", "254", "1678", "971"], blue: ["330", "2910", "5507", "118"] },
+    { label: "Playoff 2", red: ["330", "2910", "5507", "118"], blue: ["115", "254", "1678", "971"] },
+    { label: "Final 1", red: ["115", "254", "1678", "971"], blue: ["330", "2910", "5507", "118"] },
+  ].map((pm, pi) => {
+    const startMs = playoffStart + pi * matchGap;
+    const qAt = startMs - 14 * min, odAt = startMs - 6 * min, ofAt = startMs - 2 * min;
+    let st = "Scheduled";
+    if (now > startMs + 3 * min) st = "Complete";
+    else if (now >= ofAt) st = "On Field";
+    else if (now >= odAt) st = "On Deck";
+    else if (now >= qAt) st = "Now Queuing";
+    return { label: pm.label, status: st, redTeams: pm.red, blueTeams: pm.blue, times: { estimatedQueueTime: qAt, estimatedOnDeckTime: odAt, estimatedOnFieldTime: ofAt, estimatedStartTime: startMs } };
+  });
+
+  const allMatches = [...quals, ...playoffMatches];
+  const qm = allMatches.find(m => m.status === "Now Queuing");
+
+  // Generate mock announcements based on sim progress
+  const demoAnnouncements = [];
+  const completedCount = allMatches.filter(m => m.status === "Complete").length;
+  if (completedCount >= 6 && completedCount < qualCount) {
+    demoAnnouncements.push({ id: "demo_ann_1", text: `${completedCount} matches complete \u2014 keep those checklists moving!`, urgency: "info", time: now - 2 * min });
+  }
+  if (completedCount >= qualCount) {
+    demoAnnouncements.push({ id: "demo_ann_2", text: "Quals complete \u2014 playoff matches starting soon!", urgency: "urgent", time: now - 1 * min });
+  }
+
+  return {
+    eventKey: "demo", dataAsOfTime: now, nowQueuing: qm?.label || null,
+    matches: allMatches, announcements: demoAnnouncements, partsRequests: [],
+  };
+}
+
+// Demo speed control component shown in demo mode
+function DemoSpeedControl() {
+  const [speed, setSpeed] = useState(getDemoSpeed());
+  const speeds = [1, 2, 4, 8, 12];
+  return (
+    <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+      <span style={{ fontSize: 9, color: "rgba(255,255,255,.5)", fontWeight: 600 }}>SIM</span>
+      {speeds.map(s => (
+        <button key={s} onClick={() => { setDemoSpeed(s); setSpeed(s); }}
+          style={{ padding: "2px 6px", borderRadius: 5, border: `1px solid ${speed === s ? "#a78bfa" : "rgba(255,255,255,.15)"}`, background: speed === s ? "rgba(167,139,250,.3)" : "transparent", color: speed === s ? "#c4b5fd" : "rgba(255,255,255,.4)", fontSize: 9, fontWeight: 700, cursor: "pointer" }}>
+          {s}x
+        </button>
+      ))}
+      <button onClick={() => { resetDemoAnchor(); }} title="Reset simulation to beginning"
+        style={{ padding: "2px 6px", borderRadius: 5, border: "1px solid rgba(248,113,113,.3)", background: "rgba(248,113,113,.1)", color: "#fca5a5", fontSize: 9, fontWeight: 700, cursor: "pointer", marginLeft: 2 }}>
+        Reset
+      </button>
+    </div>
+  );
 }
 
 // ╔══════════════════════════════════════════════════════════════════════════════╗
@@ -2117,11 +2226,14 @@ function LeadApp({ div, onBack, demoMode, onToggleDemo }) {
         </div>
       </div>}
 
-      {demoMode && <div style={{ background: "linear-gradient(90deg,#1e0a3c,#2d1b69)", padding: "7px 14px", display: "flex", alignItems: "center", gap: 8 }}>
-        <span style={{ fontSize: 12 }}>{"\u{1F9EA}"}</span>
-        <span style={{ fontWeight: 700, fontSize: 11, color: "white" }}>DEMO MODE</span>
-        <span style={{ fontSize: 10, color: "rgba(255,255,255,.6)", marginLeft: 4 }}>2025 Pinnacles data &middot; emails suppressed</span>
-        <button onClick={onToggleDemo} style={{ marginLeft: "auto", background: "rgba(255,255,255,.15)", border: "1px solid rgba(255,255,255,.3)", borderRadius: 6, padding: "3px 8px", fontSize: 10, fontWeight: 700, color: "white", cursor: "pointer" }}>Exit</button>
+      {demoMode && <div style={{ background: "linear-gradient(90deg,#1e0a3c,#2d1b69)", padding: "7px 14px", display: "flex", flexDirection: "column", gap: 6 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ fontSize: 12 }}>{"\u{1F9EA}"}</span>
+          <span style={{ fontWeight: 700, fontSize: 11, color: "white" }}>COMP SIMULATION</span>
+          <span style={{ fontSize: 10, color: "rgba(255,255,255,.6)" }}>emails suppressed</span>
+          <button onClick={onToggleDemo} style={{ marginLeft: "auto", background: "rgba(255,255,255,.15)", border: "1px solid rgba(255,255,255,.3)", borderRadius: 6, padding: "3px 8px", fontSize: 10, fontWeight: 700, color: "white", cursor: "pointer" }}>Exit</button>
+        </div>
+        <DemoSpeedControl />
       </div>}
 
       <AnnouncementBanner />
@@ -2202,10 +2314,13 @@ function DirectorApp({ onBack, onPinChange, demoMode, onToggleDemo }) {
         </div>
       </div>
 
-      {demoMode && <div style={{ background: "rgba(167,139,250,.1)", padding: "6px 14px", display: "flex", alignItems: "center", gap: 6, borderBottom: `1px solid ${T.bord}` }}>
-        <span style={{ fontSize: 11 }}>{"\u{1F9EA}"}</span>
-        <span style={{ fontSize: 11, color: T.purL, fontWeight: 600 }}>Demo Mode Active</span>
-        <button onClick={onToggleDemo} style={{ marginLeft: "auto", background: "rgba(255,255,255,.1)", border: `1px solid ${T.bord}`, borderRadius: 5, padding: "2px 7px", fontSize: 10, color: T.textM, cursor: "pointer" }}>Exit</button>
+      {demoMode && <div style={{ background: "rgba(167,139,250,.1)", padding: "6px 14px", display: "flex", flexDirection: "column", gap: 5, borderBottom: `1px solid ${T.bord}` }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <span style={{ fontSize: 11 }}>{"\u{1F9EA}"}</span>
+          <span style={{ fontSize: 11, color: T.purL, fontWeight: 600 }}>Comp Simulation Active</span>
+          <button onClick={onToggleDemo} style={{ marginLeft: "auto", background: "rgba(255,255,255,.1)", border: `1px solid ${T.bord}`, borderRadius: 5, padding: "2px 7px", fontSize: 10, color: T.textM, cursor: "pointer" }}>Exit</button>
+        </div>
+        <DemoSpeedControl />
       </div>}
 
       <div style={{ display: "flex", background: "rgba(255,255,255,.03)", borderBottom: `1px solid ${T.bord}` }}>
@@ -2249,7 +2364,10 @@ export default function App() {
     return () => clearInterval(t);
   }, []);
 
-  const toggleDemo = () => setDemoMode(d => !d);
+  const toggleDemo = () => setDemoMode(d => {
+    if (!d) resetDemoAnchor(); // reset sim clock when entering demo mode
+    return !d;
+  });
 
   return (
     <ErrorBoundary>
