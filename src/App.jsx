@@ -1027,7 +1027,7 @@ function CheckItem({ item, done, onToggle }) {
   );
 }
 
-function SectionBlock({ section, checked, onToggle }) {
+function SectionBlock({ section, checked, onToggle, onMarkSection }) {
   const [open, setOpen] = useState(true);
   const done = section.items.filter(i => checked[i.id]).length;
   const allDone = done === section.items.length;
@@ -1035,19 +1035,23 @@ function SectionBlock({ section, checked, onToggle }) {
 
   return (
     <div style={{ borderRadius: 10, overflow: "hidden", border: `1px solid ${allDone ? "#bbf7d0" : "#e2e8f0"}`, marginBottom: 8, boxShadow: "0 1px 3px rgba(0,0,0,.06)" }}>
-      <button onClick={() => setOpen(o => !o)}
-        style={{ width: "100%", background: allDone ? "#f0fdf4" : section.bg || "#f8fafc", border: "none", cursor: "pointer", padding: "11px 14px", display: "flex", alignItems: "center", gap: 10, textAlign: "left" }}>
-        <div style={{ width: 3, height: 32, borderRadius: 2, background: section.color, flexShrink: 0 }} />
-        <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 700, fontSize: 13, color: section.color }}>{section.title}</div>
-          <div style={{ fontSize: 11, color: "#64748b" }}>{done}/{section.items.length} complete</div>
-        </div>
-        <div style={{ width: 56, background: "#e2e8f0", borderRadius: 99, height: 5, overflow: "hidden" }}>
-          <div style={{ width: `${pct}%`, height: "100%", background: allDone ? "#16a34a" : section.color, borderRadius: 99, transition: "width .3s" }} />
-        </div>
-        {allDone && <span style={{ fontSize: 14 }}>{"\u2705"}</span>}
-        <span style={{ color: "#94a3b8", fontSize: 12 }}>{open ? "\u25BE" : "\u25B8"}</span>
-      </button>
+      <div style={{ display: "flex", alignItems: "center", background: allDone ? "#f0fdf4" : section.bg || "#f8fafc" }}>
+        <button onClick={() => setOpen(o => !o)}
+          style={{ flex: 1, background: "none", border: "none", cursor: "pointer", padding: "11px 14px", display: "flex", alignItems: "center", gap: 10, textAlign: "left" }}>
+          <div style={{ width: 3, height: 32, borderRadius: 2, background: section.color, flexShrink: 0 }} />
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 700, fontSize: 13, color: section.color }}>{section.title}</div>
+            <div style={{ fontSize: 11, color: "#64748b" }}>{done}/{section.items.length} complete</div>
+          </div>
+          <div style={{ width: 56, background: "#e2e8f0", borderRadius: 99, height: 5, overflow: "hidden" }}>
+            <div style={{ width: `${pct}%`, height: "100%", background: allDone ? "#16a34a" : section.color, borderRadius: 99, transition: "width .3s" }} />
+          </div>
+          {allDone && <span style={{ fontSize: 14 }}>{"\u2705"}</span>}
+          <span style={{ color: "#94a3b8", fontSize: 12 }}>{open ? "\u25BE" : "\u25B8"}</span>
+        </button>
+        {!allDone && onMarkSection && <button onClick={(e) => { e.stopPropagation(); onMarkSection(section.items.map(i => i.id)); }}
+          style={{ background: section.color, color: "white", border: "none", borderRadius: 6, padding: "5px 9px", fontSize: 10, fontWeight: 700, cursor: "pointer", marginRight: 10, whiteSpace: "nowrap", flexShrink: 0 }}>{"\u2713"} All</button>}
+      </div>
       {open && <div>{section.items.map(item => <CheckItem key={item.id} item={item} done={!!checked[item.id]} onToggle={onToggle} />)}</div>}
     </div>
   );
@@ -1184,6 +1188,15 @@ function ChecklistTab({ div, nexusData, tbaMatches, autoMatch, demoMode }) {
     setMarkAll(false);
   };
 
+  const markSection = useCallback(async (ids) => {
+    setChecked(prev => {
+      const next = { ...prev };
+      ids.forEach(id => { next[id] = true; });
+      ss(sKey(), { checked: next, updatedBy: lead || "unknown", division: div, updatedAt: Date.now() });
+      return next;
+    });
+  }, [sKey, lead, div]);
+
   const doReset = async () => {
     setChecked({});
     setMsg("");
@@ -1282,7 +1295,7 @@ function ChecklistTab({ div, nexusData, tbaMatches, autoMatch, demoMode }) {
       </div>}
 
       <div style={{ padding: "12px 14px 0" }}>
-        {sections.map(s => <SectionBlock key={s.id} section={s} checked={checked} onToggle={toggle} />)}
+        {sections.map(s => <SectionBlock key={s.id} section={s} checked={checked} onToggle={toggle} onMarkSection={markSection} />)}
       </div>
 
       <div style={{ padding: "4px 14px" }}>
