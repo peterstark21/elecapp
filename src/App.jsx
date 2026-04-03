@@ -34,6 +34,16 @@ const CONFIG = {
   youtubeStreamUrl: "https://www.youtube.com/watch?v=eeGYe9lUGLk", // paste YouTube livestream URL when available
 };
 
+const TEAM_NUM = CONFIG.team.number;
+const TEAM_KEY = CONFIG.team.key;
+const EVENT_KEY = CONFIG.event.key;
+const TBA_KEY = CONFIG.apis.tbaKey;
+const NEXUS_EVENT = CONFIG.apis.nexusEvent;
+const DEMO_TBA_EVENT = CONFIG.demo.tbaEvent;
+const DEMO_TBA_TEAM = CONFIG.demo.tbaTeam;
+const HARDCODED_NEXUS_KEY = CONFIG.apis.nexusKey;
+const YOUTUBE_STREAM_URL = CONFIG.youtubeStreamUrl;
+
 // ╔══════════════════════════════════════════════════════════════════════════════╗
 // ║  SECTION 2: STORAGE KEYS                                                    ║
 // ║  All localStorage/Upstash keys used by the app.                              ║
@@ -51,6 +61,7 @@ const SK = {
   issues:   "frc115_issues_v2",
   nexus:    "frc115_nexus_key_v1",
   dirPin:   "frc115_dir_pin_v1",
+  dirItems: "frc115_dir_items_v1",
   hiddenItems: "frc115_hidden_items_v1",
 };
 
@@ -419,24 +430,69 @@ function nexusSS(status){if(!status)return null;const s=status.toLowerCase();
   if(s.includes("complete"))return{bg:"#f1f5f9",text:"#64748b",label:status};
   return{bg:"#eff6ff",text:"#1d4ed8",label:status};}
 
-async function sendEmail(mLabel,leadName,div,completed,total,quickMode){
-  const url="https://api.emailjs.com/api/v1.0/email/send";
-  const payload={service_id:EJS_SERVICE,template_id:EJS_TEMPLATE,user_id:EJS_PUBKEY,
-    accessToken:EJS_PUBKEY,
-    template_params:{to_email:NOTIFY_EMAIL,team_number:"115",match_label:mLabel,
-      lead_name:`${leadName||"Unknown"} (${div})`,completed:String(completed),total:String(total),
-      submitted_time:new Date().toLocaleTimeString(),event:EVENT_NAME,
-      method:quickMode?"Quick Complete":"Manual"}};
+async function sendEmail(mLabel, leadName, div, completed, total, quickMode) {
+  const url = "https://api.emailjs.com/api/v1.0/email/send";
+  const payload = {
+    service_id: CONFIG.email.serviceId,
+    template_id: CONFIG.email.templateId,
+    user_id: CONFIG.email.publicKey,
+    template_params: {
+      to_email: CONFIG.email.notifyEmail,
+      team_number: CONFIG.team.number,
+      match_label: mLabel,
+      lead_name: `${leadName || "Unknown"} (${div})`,
+      completed: String(completed),
+      total: String(total),
+      submitted_time: new Date().toLocaleTimeString(),
+      event: CONFIG.event.name,
+      method: quickMode ? "Quick Complete" : "Manual",
+    },
+  };
 
-  const sendOnce=async(attempt)=>{
-    const ctrl=new AbortController();
-    const t=setTimeout(()=>ctrl.abort(),10000);
-    try{
-      const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload),signal:ctrl.signal});
-      if(!r.ok){
-        const msg=await r.text().catch(()=>"");
-        console.warn("EmailJS non-OK response",{
-          attempt,status:r.status,body:msg,online:navigator.onLine,origin:window.location.origin,mLabel,div
+  const sendOnce = async (attempt) => {
+    const ctrl = new AbortController();
+    const timeout = setTimeout(() => ctrl.abort(), 10000);
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        signal: ctrl.signal,
+      });
+      if (!res.ok) {
+        const body = await res.text().catch(() => "");
+        console.warn(`[EmailJS] Attempt ${attempt} failed — HTTP ${res.status}: ${body}`);
+      }
+      return res.ok;
+    } catch (err) {
+      console.warn(`[EmailJS] Attempt ${attempt} error:`, err.message);
+      throw err;
+    } finally {
+      clearTimeout(timeout);
+    }
+  };
+
+  try {
+    return await sendOnce(1);
+  } catch {
+    if (!navigator.onLine) return false;
+    await new Promise((r) => setTimeout(r, 1200));
+    try {
+      return await sendOnce(2);
+    } catch {
+      return false;
+    }
+  }
+}
+
+function SyncStatus() {
+  const [status, setStatus] = useState("checking");
+
+  useEffect(() => {
+    const check = async () => {
+      try {
+        const r = await fetch(`${CONFIG.upstash.url}/ping`, {
+          headers: { Authorization: `Bearer ${CONFIG.upstash.token}` },
         });
         const j = await r.json();
         setStatus(j.result === "PONG" ? "synced" : "error");
@@ -985,7 +1041,7 @@ function ScheduleTab({nexusData,tbaMatches,onFetch,loading,error}){
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
           <span style={{ fontSize: 26, fontWeight: 800, color: passed ? "#dc2626" : undefined }}>{lbl}</span>
-          {nxStatus && <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 99, background: nxStatus.bg, color: nxStatus.text }}>{nxStatus.label}</span>}
+          {ss2 && <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 99, background: ss2.bg, color: ss2.text }}>{ss2.label}</span>}
         </div>
         {ts && <div style={{ fontSize: 12, color: passed ? "#64748b" : T.textD, marginBottom: 4 }}>{fmtDate(ts)} &middot; {fmtTime(ts)}</div>}
         {diffMs !== null && !passed && <div style={{ fontFamily: "monospace", fontSize: 28, fontWeight: 700, letterSpacing: 2, marginBottom: 4, color: urgent ? "#dc2626" : undefined }}>{fmtCD(diffMs)}</div>}
@@ -1012,7 +1068,7 @@ function ScheduleTab({nexusData,tbaMatches,onFetch,loading,error}){
   return(<div style={{padding:14}}>
     {renderHero(nextNx,nextTba)}
     <div style={{display:"flex",gap:8,marginBottom:14}}>
-      <button onClick={onFetch} disabled={loading} style={{flex:1,background:T.pur,color:"white",border:"none",borderRadius:8,padding:"10px",fontWeight:700,fontSize:13,cursor:"pointer",opacity:loading?.7:1}}>{loading?"Loading…":"🔄 Fetch Schedule"}</button>
+      <button onClick={onFetch} disabled={loading} style={{flex:1,background:T.pur,color:"white",border:"none",borderRadius:8,padding:"10px",fontWeight:700,fontSize:13,cursor:"pointer",opacity:loading?0.7:1}}>{loading?"Loading…":"🔄 Fetch Schedule"}</button>
       <button onClick={async()=>{if("Notification" in window){await Notification.requestPermission();if("serviceWorker" in navigator)navigator.serviceWorker.register("/sw.js").catch(()=>{});}}} style={{background:T.card2,border:`1px solid ${T.bord}`,borderRadius:8,padding:"10px 12px",fontWeight:600,fontSize:12,cursor:"pointer",color:T.textM}}>🔔</button>
     </div>
     {error&&<div style={{background:"#fee2e2",border:"1px solid #fca5a5",borderRadius:8,padding:"10px 12px",fontSize:12,color:"#991b1b",marginBottom:12}}>{error}</div>}
@@ -1035,9 +1091,15 @@ function ScheduleTab({nexusData,tbaMatches,onFetch,loading,error}){
                 {soon&&<span style={{fontSize:10,fontWeight:700,background:"#fee2e2",color:"#dc2626",padding:"1px 6px",borderRadius:4}}>QUEUE NOW</span>}
                 {passed&&<span style={{fontSize:10,color:T.textD}}>✓ passed</span>}
               </div>
+              <div style={{fontSize:11,color:T.textD}}>{ts?`${fmtDate(ts)} · ${fmtTime(ts)}`:""}</div>
+              {!passed&&qMs&&<div style={{fontSize:10,color:soon?"#dc2626":T.textD,marginTop:1}}>{trig?`Queue at start of ${trig.label}`:`Queue at ${fmtTime(qMs)}`}</div>}
             </div>
-          );
-        })}
+            <div style={{textAlign:"right",flexShrink:0}}>
+              {al&&<div style={{fontSize:11,color:T.textD}}>w/ #{al.partners.join(", #")}</div>}
+              {!passed&&diffMs!==null&&<div style={{fontFamily:"monospace",fontSize:11,fontWeight:700,marginTop:2,color:soon?"#dc2626":T.textM}}>{diffMs>=0?fmtCD(diffMs):"Queue!"}</div>}
+            </div>
+          </div>
+        </div>);})}
       </div>}
     </div>
   );
@@ -1518,8 +1580,10 @@ function DirectorIssues() {
               <button onClick={() => remove(iss.id)} style={{ background: "none", border: "none", cursor: "pointer", color: T.red, fontSize: 16, flexShrink: 0 }}>{"\u2715"}</button>
             </div>
           </div>
-        </div>);})}
-    </div>);}
+        );
+      })}
+    </div>
+  );}
 
 // ── DIRECTOR: SETTINGS ────────────────────────────────────────────────────────
 function DirectorSettings({onLock,onPinChange}){
@@ -1563,7 +1627,7 @@ function DirectorSettings({onLock,onPinChange}){
               return(
                 <div key={item.id} onClick={()=>toggleHidden(item.id)}
                   style={{display:"flex",alignItems:"center",gap:8,padding:"6px 8px",borderRadius:6,marginBottom:2,cursor:"pointer",
-                    background:isHidden?"rgba(248,113,113,.1)":"rgba(255,255,255,.03)",border:`1px solid ${isHidden?"rgba(248,113,113,.3)":T.bord}`,opacity:isHidden?.6:1}}>
+                    background:isHidden?"rgba(248,113,113,.1)":"rgba(255,255,255,.03)",border:`1px solid ${isHidden?"rgba(248,113,113,.3)":T.bord}`,opacity:isHidden?0.6:1}}>
                   <span style={{fontSize:12,flexShrink:0}}>{isHidden?"🚫":"✅"}</span>
                   <div style={{flex:1,fontSize:11,color:isHidden?T.red:T.text,textDecoration:isHidden?"line-through":"none"}}>{item.text}</div>
                   <span style={{fontSize:9,fontWeight:700,padding:"1px 5px",borderRadius:4,
