@@ -368,7 +368,7 @@ const SW_SECTIONS = [
 
 const DIVISION_SECTIONS = { elec: ELEC_SECTIONS, mech: MECH_SECTIONS, sw: SW_SECTIONS };
 const getAllItemsStatic = (div,hidden) => {const items=(DIVISION_SECTIONS[div]||[]).flatMap(s=>s.items);return hidden?items.filter(i=>!hidden.has(i.id)):items;};
-const getCritItems = (div,hidden) => getAllItemsStatic(div,hidden).filter(i=>i.priority==="CRITICAL");
+const getCritItemsStatic = (div,hidden) => getAllItemsStatic(div,hidden).filter(i=>i.priority==="CRITICAL");
 const filterSections = (div,hidden) => {
   if(!hidden||!hidden.size)return DIVISION_SECTIONS[div]||[];
   return (DIVISION_SECTIONS[div]||[]).map(s=>({...s,items:s.items.filter(i=>!hidden.has(i.id))})).filter(s=>s.items.length>0);
@@ -741,7 +741,25 @@ function DivisionPicker({ onPick, onBack }) {
     </div>
   );
 }
+function Badge({ p }) {
+  const colors = {
+    high: "#ef4444",
+    medium: "#f59e0b",
+    low: "#10b981"
+  };
 
+  return (
+    <span style={{
+      background: colors[p] || "#6b7280",
+      color: "white",
+      padding: "2px 6px",
+      borderRadius: "6px",
+      fontSize: "12px"
+    }}>
+      {p || "?"}
+    </span>
+  );
+}
 // ╔══════════════════════════════════════════════════════════════════════════════╗
 // ║  SECTION 13: CHECKLIST UI COMPONENTS                                         ║
 // ╚══════════════════════════════════════════════════════════════════════════════╝
@@ -873,7 +891,7 @@ function ChecklistTab({div,nexusData,tbaMatches,autoMatch,demoMode}){
   const sections=filterSections(div,hidden);
   const allItems=getAllItemsStatic(div,hidden);
   const allIds=allItems.map(i=>i.id);
-  const critItems=getCritItems(div,hidden);
+  const critItems=getCritItemsStatic(div,hidden);
   const divCfg=DIVS[div];
 
   const [checked,setChecked]=useState({});
