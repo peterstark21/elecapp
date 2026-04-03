@@ -32,6 +32,7 @@ const SK = {
   issues:   "frc115_issues_v2",
   nexus:    "frc115_nexus_key_v1",
   dirPin:   "frc115_dir_pin_v1",
+  hiddenItems: "frc115_hidden_items_v1",
 };
 const SYNC_KEYS = Object.values(SK);
 
@@ -121,126 +122,67 @@ const PC = {
 // ── ELECTRICAL CHECKLIST DATA ─────────────────────────────────────────────────
 const ELEC_SECTIONS = [
   {id:"power",title:"⚡ Power & Battery",color:"#b91c1c",bg:"#fef2f2",items:[
-    {id:"p1",priority:"CRITICAL",text:"Battery fully charged (≥ 120%)",note:"Use Battery Beak — ideally 130%+"},
-    {id:"p2",priority:"CRITICAL",text:"Anderson PowerPole battery connector fully seated & locked",note:"Tug test — zero give"},
-    {id:"p3",priority:"CRITICAL",text:"120A main breaker ON and reset (button fully out)",note:"Press to reset if tripped"},
-    {id:"p4",priority:"CRITICAL",text:"Circuit breaker tight — no loose nuts or corrosion",note:"Corrosion causes voltage drop"},
-    {id:"p5",priority:"CRITICAL",text:"Battery secured in mount",note:"Must not move under hard acceleration"},
-    {id:"p6",priority:"CRITICAL",text:"Main power leads (red/black) have no exposed copper",note:"Inspect ferrule crimp ends and full wire run"},
-    {id:"p7",priority:"HIGH",text:"REV PDH 2.0 (main) mounted firmly — no flex or wobble",note:"Main PDH handles CAN termination and voltage display"},
-    {id:"p8",priority:"HIGH",text:"REV PDH 2.0 voltage display reading 12.0–13.0V",note:"Only PDH with display — blue digits stable and visible"},
-    {id:"p9",priority:"HIGH",text:"All REV PDH 2.0 breaker slots occupied or blanked",note:"Open ports = short circuit risk"},
-    {id:"p10",priority:"HIGH",text:"REV PDH 2.0 ferrule crimp power input fully seated — tug tested",note:"Partial insertion = full power loss"},
-    {id:"p11",priority:"HIGH",text:"Mini PDH #1 mounted firmly and power input ferrule crimps fully seated",note:"Mini PDHs have no display — physical check only"},
-    {id:"p12",priority:"HIGH",text:"Mini PDH #2 mounted firmly and power input ferrule crimps fully seated",note:"Tug both input leads"},
-    {id:"p13",priority:"MEDIUM",text:"All three PDH breaker ratings match assigned device requirements",note:"Verify no breakers swapped between matches"},
+    {id:"p1",priority:"CRITICAL",text:"Battery charged ≥ 120% and secured in mount",note:"Battery Beak — ideally 130%+; must not move under acceleration"},
+    {id:"p2",priority:"CRITICAL",text:"Anderson PowerPole seated & locked — tug tested",note:null},
+    {id:"p3",priority:"CRITICAL",text:"120A main breaker ON and reset",note:"Button fully out; press to reset if tripped"},
+    {id:"p4",priority:"CRITICAL",text:"Main power leads — no exposed copper, ferrules intact",note:null},
+    {id:"p5",priority:"HIGH",text:"REV PDH 2.0 mounted firm, voltage 12.0–13.0V, all slots occupied/blanked",note:"Main PDH — blue digits stable"},
+    {id:"p6",priority:"HIGH",text:"Both Mini PDHs mounted firm, power ferrules tug tested",note:"No display — physical check only"},
+    {id:"p7",priority:"MEDIUM",text:"PDH breaker ratings match assigned devices",note:null},
   ]},
-  {id:"roborio",title:"🖥️ RoboRIO 2.0 & Radio",color:"#1d4ed8",bg:"#eff6ff",items:[
-    {id:"r1",priority:"CRITICAL",text:"RoboRIO STATUS light solid green, COMM light green",note:"Solid red/orange = fault; investigate before queue"},
-    {id:"r2",priority:"CRITICAL",text:"RSL connected and blinking orange",note:"Required by rules — blinking = enabled"},
-    {id:"r3",priority:"CRITICAL",text:"Radio powered — COMM LED green",note:"Confirm correct team number config"},
-    {id:"r4",priority:"CRITICAL",text:"Ethernet cable RoboRIO ↔ radio fully seated on both ends",note:"Click-lock test; half-seated = no comms"},
-    {id:"r5",priority:"HIGH",text:"RoboRIO power ferrule crimps fully seated — tug tested",note:"Loose ferrule = brownsout entire RIO"},
-    {id:"r6",priority:"HIGH",text:"Radio power cable firmly connected",note:"Common transport damage point"},
-    {id:"r7",priority:"HIGH",text:"CANivore USB cable to RoboRIO strain-relieved and seated",note:"This is the entire drivetrain CAN backbone"},
-    {id:"r8",priority:"MEDIUM",text:"RoboRIO mounting screws tight — no vibration movement",note:"Loose RIO = intermittent ground faults"},
+  {id:"roborio",title:"🖥️ RoboRIO & Radio",color:"#1d4ed8",bg:"#eff6ff",items:[
+    {id:"r1",priority:"CRITICAL",text:"RoboRIO STATUS green, COMM green, RSL blinking orange",note:"Red/orange = fault; investigate before queue"},
+    {id:"r2",priority:"CRITICAL",text:"Radio powered — COMM LED green",note:null},
+    {id:"r3",priority:"CRITICAL",text:"Ethernet RoboRIO ↔ radio click-locked both ends",note:null},
+    {id:"r4",priority:"HIGH",text:"RoboRIO & radio power ferrules tug tested",note:null},
+    {id:"r5",priority:"HIGH",text:"CANivore USB to RoboRIO strain-relieved and seated",note:"Entire drivetrain CAN backbone"},
   ]},
   {id:"can",title:"🔌 CAN Bus",color:"#15803d",bg:"#f0fdf4",items:[
-    {id:"c1",priority:"CRITICAL",text:"Standalone 120Ω termination resistor seated at open end of CAN chain",note:"Tug test JST — can vibrate loose"},
-    {id:"c2",priority:"CRITICAL",text:"CAN chain end at REV PDH fully plugged in",note:"PDH provides built-in 120Ω — Mini PDHs have no CAN ports"},
-    {id:"c3",priority:"CRITICAL",text:"No CAN wire pinched in cross rails or pivot zones",note:"Walk full CAN run; pinched wire fails under vibration"},
-    {id:"c4",priority:"CRITICAL",text:"Kraken X60 #1 (FL drive) CAN connector seated — tug tested",note:"One loose joint drops all downstream devices"},
-    {id:"c5",priority:"CRITICAL",text:"Kraken X60 #2 (FR drive) CAN connector seated — tug tested",note:null},
-    {id:"c6",priority:"CRITICAL",text:"Kraken X60 #3 (BL drive) CAN connector seated — tug tested",note:null},
-    {id:"c7",priority:"CRITICAL",text:"Kraken X60 #4 (BR drive) CAN connector seated — tug tested",note:null},
-    {id:"c8",priority:"CRITICAL",text:"Falcon 500 #1 (FL turn) CAN connector seated — tug tested",note:"Falcon CAN loosens under vibration"},
-    {id:"c9",priority:"CRITICAL",text:"Falcon 500 #2 (FR turn) CAN connector seated — tug tested",note:null},
-    {id:"c10",priority:"CRITICAL",text:"Falcon 500 #3 (BL turn) CAN connector seated — tug tested",note:null},
-    {id:"c11",priority:"CRITICAL",text:"Falcon 500 #4 (BR turn) CAN connector seated — tug tested",note:null},
-    {id:"c12",priority:"CRITICAL",text:"CANcoder #1 (FL steer) seated",note:"Lost CANcoder = wrong wheel angle = dangerous enable"},
-    {id:"c13",priority:"CRITICAL",text:"CANcoder #2 (FR steer) seated",note:null},
-    {id:"c14",priority:"CRITICAL",text:"CANcoder #3 (BL steer) seated",note:null},
-    {id:"c15",priority:"CRITICAL",text:"CANcoder #4 (BR steer) seated",note:null},
-    {id:"c16",priority:"CRITICAL",text:"Pigeon 2.0 CAN connector seated — tug tested",note:"Lost Pigeon = no field-centric drive"},
-    {id:"c17",priority:"HIGH",text:"Kraken X60 #1 LED — solid orange, no fault blink",note:"Rapid red blink = fault; check Tuner X"},
-    {id:"c18",priority:"HIGH",text:"Kraken X60 #2 LED — no fault blink",note:null},
-    {id:"c19",priority:"HIGH",text:"Kraken X60 #3 LED — no fault blink",note:null},
-    {id:"c20",priority:"HIGH",text:"Kraken X60 #4 LED — no fault blink",note:null},
-    {id:"c21",priority:"HIGH",text:"Falcon 500 #1 LED — no fault blink",note:null},
-    {id:"c22",priority:"HIGH",text:"Falcon 500 #2 LED — no fault blink",note:null},
-    {id:"c23",priority:"HIGH",text:"Falcon 500 #3 LED — no fault blink",note:null},
-    {id:"c24",priority:"HIGH",text:"Falcon 500 #4 LED — no fault blink",note:null},
-    {id:"c25",priority:"HIGH",text:"CANcoder #1 LED — solid or slow blink, no fast fault blink",note:null},
-    {id:"c26",priority:"HIGH",text:"CANcoder #2 LED — no fast fault blink",note:null},
-    {id:"c27",priority:"HIGH",text:"CANcoder #3 LED — no fast fault blink",note:null},
-    {id:"c28",priority:"HIGH",text:"CANcoder #4 LED — no fast fault blink",note:null},
-    {id:"c29",priority:"HIGH",text:"Pigeon 2.0 LED — boot-complete pattern after power-on",note:"Rapid blink = IMU fault"},
-    {id:"c30",priority:"HIGH",text:"CANivore LED — solid green after boot",note:"Red/off = USB issue; re-seat USB to RoboRIO"},
-    {id:"c31",priority:"HIGH",text:"All CAN device IDs unique — no conflicts in Tuner X",note:"Duplicate IDs = unpredictable behavior"},
-    {id:"c32",priority:"HIGH",text:"All CAN devices visible in Tuner X with no active faults",note:"Any red entry = do not queue"},
-    {id:"c33",priority:"MEDIUM",text:"CAN bus utilization below 90%",note:"High utilization = delayed motor commands"},
+    {id:"c1",priority:"CRITICAL",text:"120Ω termination resistor seated at open end + PDH end plugged in",note:"Tug test JST — can vibrate loose"},
+    {id:"c2",priority:"CRITICAL",text:"No CAN wire pinched in cross rails or pivot zones",note:"Walk full CAN run"},
+    {id:"c3",priority:"CRITICAL",text:"All 4 Kraken (drive) CAN connectors seated — tug tested",note:"One loose joint drops all downstream"},
+    {id:"c4",priority:"CRITICAL",text:"All 4 Falcon (turn) CAN connectors seated — tug tested",note:null},
+    {id:"c5",priority:"CRITICAL",text:"All 4 CANcoders seated — tug tested",note:"Lost CANcoder = wrong wheel angle"},
+    {id:"c6",priority:"CRITICAL",text:"Pigeon 2.0 CAN connector seated — tug tested",note:null},
+    {id:"c7",priority:"HIGH",text:"All motor & CANcoder LEDs normal — no fault blinks",note:"Rapid red = fault; check Tuner X"},
+    {id:"c8",priority:"HIGH",text:"CANivore LED solid green, Pigeon boot-complete",note:null},
+    {id:"c9",priority:"HIGH",text:"All CAN devices visible in Tuner X — no conflicts or faults",note:"Any red entry = do not queue"},
+    {id:"c10",priority:"MEDIUM",text:"CAN bus utilization below 90%",note:null},
   ]},
   {id:"swerve",title:"🌀 Swerve Drive (×4)",color:"#7e22ce",bg:"#faf5ff",items:[
-    {id:"s1",priority:"CRITICAL",text:"All 4 Kraken X60 power connectors fully seated — tug tested",note:"Check at PDH and at motor"},
-    {id:"s2",priority:"CRITICAL",text:"All 4 Falcon 500 power connectors fully seated — tug tested",note:"Falcons loosen under vibration"},
-    {id:"s3",priority:"CRITICAL",text:"All 4 CANcoder connectors secure on steer modules",note:"Loose = incorrect wheel angle on enable"},
-    {id:"s4",priority:"CRITICAL",text:"All 4 CANcoder absolute positions correct",note:"Verify in Tuner X — bad offsets = unsafe enable"},
-    {id:"s5",priority:"CRITICAL",text:"No motor wires in swerve rotation path — free flex through full range",note:"Rotate each module by hand and watch wires"},
-    {id:"s6",priority:"HIGH",text:"All 4 Kraken LEDs — no fault pattern",note:"Check Phoenix Tuner X"},
-    {id:"s7",priority:"HIGH",text:"All 4 Falcon LEDs — no fault pattern",note:"Check Phoenix Tuner X"},
-    {id:"s8",priority:"HIGH",text:"Spin each motor by hand — no grinding or resistance",note:"Binding = overcurrent in-match"},
-    {id:"s9",priority:"MEDIUM",text:"Swerve module mounting bolts tight",note:"Loose modules = steering angle drift"},
-    {id:"s10",priority:"MEDIUM",text:"Krakens and Falcons cool to touch",note:"Too hot = thermal issue; check airflow"},
+    {id:"s1",priority:"CRITICAL",text:"All 8 motor power connectors (4 Kraken + 4 Falcon) tug tested",note:"Check at PDH and at motor"},
+    {id:"s2",priority:"CRITICAL",text:"All 4 CANcoder absolute positions correct in Tuner X",note:"Bad offsets = unsafe enable"},
+    {id:"s3",priority:"CRITICAL",text:"No wires in swerve rotation path — full range clear",note:"Rotate each module by hand"},
+    {id:"s4",priority:"HIGH",text:"Spin each motor by hand — no grinding or resistance",note:"Binding = overcurrent in-match"},
+    {id:"s5",priority:"MEDIUM",text:"Module bolts tight, motors cool to touch",note:null},
   ]},
-  {id:"pigeon",title:"📡 Pigeon 2.0",color:"#0f766e",bg:"#f0fdfa",items:[
-    {id:"g1",priority:"CRITICAL",text:"Pigeon 2.0 rigidly mounted — zero looseness",note:"IMU movement corrupts heading for field-centric drive"},
-    {id:"g2",priority:"CRITICAL",text:"Pigeon CAN and power connections seated — tug tested",note:"JST connector"},
-    {id:"g3",priority:"HIGH",text:"Pigeon heading reads 0° after yaw reset",note:"Reset before each match"},
-    {id:"g4",priority:"MEDIUM",text:"Pigeon firmware current (check Tuner X)",note:null},
+  {id:"pigeon",title:"📡 Pigeon & Limelight",color:"#0f766e",bg:"#f0fdfa",items:[
+    {id:"g1",priority:"CRITICAL",text:"Pigeon rigidly mounted, CAN + power seated — tug tested",note:"IMU movement corrupts heading"},
+    {id:"g2",priority:"CRITICAL",text:"Limelight power seated (LED ring on) + Ethernet click-locked",note:null},
+    {id:"g3",priority:"HIGH",text:"Pigeon heading 0° after yaw reset",note:"Reset before each match"},
+    {id:"g4",priority:"HIGH",text:"Limelight reachable on network, mounting rigid",note:"ping limelight.local"},
+    {id:"g5",priority:"MEDIUM",text:"Correct vision pipeline selected, lens clean",note:null},
   ]},
-  {id:"limelight",title:"📷 Limelight",color:"#166534",bg:"#f0fdf4",items:[
-    {id:"l1",priority:"CRITICAL",text:"Limelight power cable fully seated — LED ring on at boot",note:"Check green status LED"},
-    {id:"l2",priority:"CRITICAL",text:"Limelight Ethernet fully clicked in to network switch",note:"Required for vision data"},
-    {id:"l3",priority:"HIGH",text:"Limelight mounting rigid — bracket bolts tight",note:"Camera angle shift corrupts targeting"},
-    {id:"l4",priority:"HIGH",text:"Limelight reachable on network (ping limelight.local)",note:"No network = no auto vision"},
-    {id:"l5",priority:"MEDIUM",text:"Correct pipeline selected for current game mode",note:null},
-    {id:"l6",priority:"MEDIUM",text:"Camera lens clean — no smudges or debris",note:"Quick microfiber wipe before queue"},
-  ]},
-  {id:"connections",title:"🔗 Connection Integrity",color:"#92400e",bg:"#fffbeb",items:[
-    {id:"cn1",priority:"CRITICAL",text:"Tug test ALL PowerPole connectors — none pull loose",note:"Battery, main PDH, both Mini PDHs, all branches"},
-    {id:"cn2",priority:"CRITICAL",text:"Tug test ALL ferrule crimp ends",note:"Any movement = re-crimp before queuing"},
-    {id:"cn3",priority:"CRITICAL",text:"No blackened, burned, or melted connectors",note:"Discoloration = arcing; fix root cause"},
-    {id:"cn4",priority:"HIGH",text:"All Wago lever connectors fully closed",note:"Check lever is fully down"},
-    {id:"cn5",priority:"HIGH",text:"All RJ45 Ethernet connectors click-lock tested",note:"RoboRIO, radio, Limelight"},
-    {id:"cn6",priority:"HIGH",text:"No exposed bare wire strands outside connectors",note:"Stray strands = short circuit"},
-    {id:"cn7",priority:"MEDIUM",text:"Ferrule crimps show no green corrosion or blackening",note:"Discoloration = heat damage"},
+  {id:"connections",title:"🔗 Connections & Wiring",color:"#92400e",bg:"#fffbeb",items:[
+    {id:"cn1",priority:"CRITICAL",text:"Tug test ALL PowerPole + ferrule crimp connections",note:"Any movement = re-crimp before queuing"},
+    {id:"cn2",priority:"CRITICAL",text:"No blackened, burned, or melted connectors",note:"Discoloration = arcing"},
+    {id:"cn3",priority:"CRITICAL",text:"No wires near spinning mechanisms, belts, or chain",note:"Walk every mechanism"},
+    {id:"cn4",priority:"CRITICAL",text:"Conduit exits capped, cross-rail clips intact, wires flush",note:"Popped clip = wires drop into moving parts"},
+    {id:"cn5",priority:"HIGH",text:"Wago levers closed, Ethernet click-locked, no exposed strands",note:null},
+    {id:"cn6",priority:"HIGH",text:"Zip ties tight/trimmed, all runs have service loop",note:"Tight wire = broken ferrule after collision"},
+    {id:"cn7",priority:"MEDIUM",text:"Visual sweep for chafe, corrosion, or loose screws near board",note:null},
   ]},
   {id:"motors",title:"⚙️ Motor Function Check",color:"#be185d",bg:"#fdf2f8",items:[
-    {id:"m1",priority:"CRITICAL",text:"Enable robot — all 4 swerve modules respond to joystick",note:"Each wheel should steer and drive correctly"},
-    {id:"m2",priority:"CRITICAL",text:"All 4 Krakens spin in correct direction",note:"Verify in Phoenix Tuner X if unsure"},
-    {id:"m3",priority:"CRITICAL",text:"All 4 Falcons respond and hold wheel angle",note:"Wheel resists manual rotation when enabled"},
-    {id:"m4",priority:"CRITICAL",text:"No motor throws a fault or brownout on enable",note:"Tuner X red entries = do not queue"},
-    {id:"m5",priority:"HIGH",text:"All mechanism motors respond to test commands",note:"Run full range in pits"},
-    {id:"m6",priority:"HIGH",text:"No unusual sounds from any motor",note:"Listen during pit enable"},
-    {id:"m7",priority:"HIGH",text:"Battery voltage stays above 11.0V during full drivetrain enable",note:"Below 10.5V = brownout risk"},
-  ]},
-  {id:"wiremgmt",title:"🔒 Wire Management",color:"#374151",bg:"#f9fafb",items:[
-    {id:"w1",priority:"CRITICAL",text:"No wires near spinning mechanisms, belts, pulleys, or chain",note:"Walk every drivetrain mechanism"},
-    {id:"w2",priority:"CRITICAL",text:"All corrugated conduit exits capped or taped",note:"Conduit exits = highest-wear points"},
-    {id:"w3",priority:"CRITICAL",text:"All 3D printed cross rail snap-in clips snapped in — none cracked",note:"Popped clip = wires drop into moving parts"},
-    {id:"w4",priority:"CRITICAL",text:"All wires seated flush inside cross rail channels",note:"Wire above edge catches on mechanisms"},
-    {id:"w5",priority:"HIGH",text:"Inspect clips for cracks — replace any damaged ones",note:"Cracked tabs create sharp points"},
-    {id:"w6",priority:"HIGH",text:"All zip ties tight and trimmed — no protruding tails",note:"Tails snag wires under vibration"},
-    {id:"w7",priority:"HIGH",text:"No wire under tension — all runs have service loop",note:"Tight wire = broken ferrule after collision"},
-    {id:"w8",priority:"SECONDARY",text:"Visual sweep for new wire chafe from last match",note:null},
-    {id:"w9",priority:"SECONDARY",text:"No loose screws near electrical board",note:"Metal screw on live PDH = fire"},
+    {id:"m1",priority:"CRITICAL",text:"Enable — all 4 swerve modules respond, correct direction",note:"Each wheel should steer and drive correctly"},
+    {id:"m2",priority:"CRITICAL",text:"No motor faults or brownouts on enable",note:"Tuner X red entries = do not queue"},
+    {id:"m3",priority:"HIGH",text:"Mechanism motors respond, no unusual sounds",note:"Run full range in pits"},
+    {id:"m4",priority:"HIGH",text:"Battery stays above 11.0V during full enable",note:"Below 10.5V = brownout risk"},
   ]},
   {id:"signoff",title:"✅ Pre-Queue Sign-Off",color:"#1f2937",bg:"#f8fafc",items:[
-    {id:"f1",priority:"CRITICAL",text:"Robot boots — RIO STATUS green, radio COMM green, RSL blinking",note:"All three must be correct"},
-    {id:"f2",priority:"CRITICAL",text:"Driver Station shows robot enabled, all CAN devices visible, no faults",note:"Tuner X must be all green"},
-    {id:"f3",priority:"HIGH",text:"Bumpers on or confirmed at queue",note:"OK to install at queue line"},
-    {id:"f4",priority:"HIGH",text:"Spare battery on charger for next match",note:"Never queue without charged spare"},
-    {id:"f5",priority:"HIGH",text:"Electrical lead has verbally signed off",note:"Two-person verification recommended"},
+    {id:"f1",priority:"CRITICAL",text:"Robot boots — RIO green, radio green, RSL blinking, DS enabled",note:"Tuner X must be all green"},
+    {id:"f2",priority:"HIGH",text:"Bumpers on or confirmed at queue",note:null},
+    {id:"f3",priority:"HIGH",text:"Spare battery on charger",note:null},
+    {id:"f4",priority:"HIGH",text:"Electrical lead has signed off",note:"Two-person verification recommended"},
   ]},
 ];
 
@@ -264,7 +206,6 @@ const MECH_SECTIONS = [
   ]},
   {id:"mech_signoff",title:"✅ Mechanical Sign-Off",color:"#1f2937",bg:"#f8fafc",items:[
     {id:"ms1",priority:"CRITICAL",text:"Mechanical lead has verified robot is ready to compete",note:null},
-    {id:"ms2",priority:"HIGH",text:"All safety pins and locks removed before enable",note:null},
   ]},
 ];
 
@@ -298,8 +239,21 @@ const SW_SECTIONS = [
 
 // ── CHECKLIST MAP ─────────────────────────────────────────────────────────────
 const DIVISION_SECTIONS = { elec: ELEC_SECTIONS, mech: MECH_SECTIONS, sw: SW_SECTIONS };
-const getAllItems = (div) => (DIVISION_SECTIONS[div]||[]).flatMap(s=>s.items);
-const getCritItems = (div) => getAllItems(div).filter(i=>i.priority==="CRITICAL");
+const getAllItems = (div,hidden) => {const items=(DIVISION_SECTIONS[div]||[]).flatMap(s=>s.items);return hidden?items.filter(i=>!hidden.has(i.id)):items;};
+const getCritItems = (div,hidden) => getAllItems(div,hidden).filter(i=>i.priority==="CRITICAL");
+const filterSections = (div,hidden) => {
+  if(!hidden||!hidden.size)return DIVISION_SECTIONS[div]||[];
+  return (DIVISION_SECTIONS[div]||[]).map(s=>({...s,items:s.items.filter(i=>!hidden.has(i.id))})).filter(s=>s.items.length>0);
+};
+function useHiddenItems(){
+  const [hidden,setHidden]=useState(new Set());
+  useEffect(()=>{ls(SK.hiddenItems).then(d=>{if(Array.isArray(d))setHidden(new Set(d));});},[]);
+  const toggle=useCallback(async(id)=>{
+    setHidden(prev=>{const next=new Set(prev);if(next.has(id))next.delete(id);else next.add(id);
+      ss(SK.hiddenItems,[...next]);return next;});
+  },[]);
+  return{hidden,toggle};
+}
 
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
@@ -754,10 +708,11 @@ function MatchIntelPanel({autoMatch,nexusData,tbaMatches}){
     </div>);}
 
 function ChecklistTab({div,nexusData,tbaMatches,autoMatch,demoMode}){
-  const sections=DIVISION_SECTIONS[div]||[];
-  const allItems=getAllItems(div);
+  const {hidden}=useHiddenItems();
+  const sections=filterSections(div,hidden);
+  const allItems=getAllItems(div,hidden);
   const allIds=allItems.map(i=>i.id);
-  const critItems=getCritItems(div);
+  const critItems=getCritItems(div,hidden);
   const divCfg=DIVS[div];
 
   const [checked,setChecked]=useState({});
@@ -886,7 +841,11 @@ function ScheduleTab({nexusData,tbaMatches,onFetch,loading,error}){
   const nextTba=t115tba.find(m=>{const ts=getTS(m);return ts&&ts*1000>now-300000;});
   useEffect(()=>{t115nx.forEach(m=>{const qi=m.times?.estimatedQueueTime;if(!qi)return;const diff=qi-now;
     if(diff>0&&diff<30000&&!alerted.current.has(m.label)){alerted.current.add(m.label);
-      if(Notification.permission==="granted")new Notification(`🤖 Team 115 — Queue for ${m.label}!`);}});},[now,t115nx]);
+      if(Notification.permission==="granted"){
+        if("serviceWorker" in navigator&&navigator.serviceWorker.ready){
+          navigator.serviceWorker.ready.then(reg=>reg.showNotification(`🤖 Team 115 — Queue for ${m.label}!`)).catch(()=>{});
+        }
+      }}});},[now,t115nx]);
 
   const renderHero=(nxM,tbaM)=>{
     if(!nxM&&!tbaM)return(
@@ -933,7 +892,7 @@ function ScheduleTab({nexusData,tbaMatches,onFetch,loading,error}){
     {renderHero(nextNx,nextTba)}
     <div style={{display:"flex",gap:8,marginBottom:14}}>
       <button onClick={onFetch} disabled={loading} style={{flex:1,background:T.pur,color:"white",border:"none",borderRadius:8,padding:"10px",fontWeight:700,fontSize:13,cursor:"pointer",opacity:loading?.7:1}}>{loading?"Loading…":"🔄 Fetch Schedule"}</button>
-      <button onClick={()=>{"Notification" in window&&Notification.requestPermission();}} style={{background:T.card2,border:`1px solid ${T.bord}`,borderRadius:8,padding:"10px 12px",fontWeight:600,fontSize:12,cursor:"pointer",color:T.textM}}>🔔</button>
+      <button onClick={async()=>{if("Notification" in window){await Notification.requestPermission();if("serviceWorker" in navigator)navigator.serviceWorker.register("/sw.js").catch(()=>{});}}} style={{background:T.card2,border:`1px solid ${T.bord}`,borderRadius:8,padding:"10px 12px",fontWeight:600,fontSize:12,cursor:"pointer",color:T.textM}}>🔔</button>
     </div>
     {error&&<div style={{background:"#fee2e2",border:"1px solid #fca5a5",borderRadius:8,padding:"10px 12px",fontSize:12,color:"#991b1b",marginBottom:12}}>{error}</div>}
     {(t115nx.length||t115tba.length)>0&&<div>
@@ -1388,6 +1347,8 @@ function DirectorSettings({onLock,onPinChange}){
   const [clearMsg,setClearMsg]=useState("");
   const [newPin,setNewPin]=useState("");const [confirmPin,setConfirmPin]=useState("");const [pinMsg,setPinMsg]=useState("");
   const [nexusInput,setNexusInput]=useState(HARDCODED_NEXUS_KEY);const [ytInput,setYtInput]=useState(YOUTUBE_STREAM_URL);
+  const {hidden,toggle:toggleHidden}=useHiddenItems();
+  const [editDiv,setEditDiv]=useState(null);
   useEffect(()=>{
     Promise.all([ls(SK.archElec),ls(SK.archMech),ls(SK.archSW),ls(SK.archDemo||"frc115_arch_demo_v6")]).then(([e,m,s,d])=>{
       setArchiveSizes({elec:(e||[]).length,mech:(m||[]).length,sw:(s||[]).length,demo:(d||[]).length});});
@@ -1402,6 +1363,37 @@ function DirectorSettings({onLock,onPinChange}){
   const btn=(col=T.pur)=>({width:"100%",background:col,color:"white",border:"none",borderRadius:8,padding:"9px",fontWeight:700,fontSize:13,cursor:"pointer",marginBottom:6});
   return(
     <div style={{padding:14,paddingBottom:32}}>
+      {/* Checklist Item Management */}
+      <div style={bS}>
+        <div style={lS}>Manage Checklist Items</div>
+        <div style={{fontSize:11,color:T.textD,marginBottom:10}}>Remove items from checklists. Leads will not see removed items. {hidden.size>0&&<span style={{color:T.amber,fontWeight:700}}>{hidden.size} item{hidden.size!==1?"s":""} hidden</span>}</div>
+        <div style={{display:"flex",gap:6,marginBottom:10}}>
+          {[["elec","⚡","Electrical"],["mech","🔧","Mechanical"],["sw","💻","Software"]].map(([d,emoji,label])=>(
+            <button key={d} onClick={()=>setEditDiv(editDiv===d?null:d)}
+              style={{flex:1,background:editDiv===d?"rgba(147,51,234,.2)":"rgba(255,255,255,.04)",border:`1px solid ${editDiv===d?T.pur:T.bord}`,borderRadius:8,padding:"8px 4px",cursor:"pointer",textAlign:"center"}}>
+              <div style={{fontSize:14}}>{emoji}</div>
+              <div style={{fontSize:9,fontWeight:700,color:editDiv===d?T.purL:T.textD}}>{label}</div>
+            </button>))}
+        </div>
+        {editDiv&&(DIVISION_SECTIONS[editDiv]||[]).map(sec=>(
+          <div key={sec.id} style={{marginBottom:8}}>
+            <div style={{fontSize:11,fontWeight:700,color:sec.color,marginBottom:4,padding:"4px 0"}}>{sec.title}</div>
+            {sec.items.map(item=>{
+              const isHidden=hidden.has(item.id);
+              return(
+                <div key={item.id} onClick={()=>toggleHidden(item.id)}
+                  style={{display:"flex",alignItems:"center",gap:8,padding:"6px 8px",borderRadius:6,marginBottom:2,cursor:"pointer",
+                    background:isHidden?"rgba(248,113,113,.1)":"rgba(255,255,255,.03)",border:`1px solid ${isHidden?"rgba(248,113,113,.3)":T.bord}`,opacity:isHidden?.6:1}}>
+                  <span style={{fontSize:12,flexShrink:0}}>{isHidden?"🚫":"✅"}</span>
+                  <div style={{flex:1,fontSize:11,color:isHidden?T.red:T.text,textDecoration:isHidden?"line-through":"none"}}>{item.text}</div>
+                  <span style={{fontSize:9,fontWeight:700,padding:"1px 5px",borderRadius:4,
+                    background:item.priority==="CRITICAL"?"rgba(239,68,68,.15)":item.priority==="HIGH"?"rgba(251,146,60,.15)":"rgba(250,204,21,.15)",
+                    color:item.priority==="CRITICAL"?"#ef4444":item.priority==="HIGH"?"#fb923c":"#fbbf24"}}>{item.priority}</span>
+                </div>);
+            })}
+          </div>))}
+      </div>
+
       <div style={bS}>
         <div style={lS}>Change Director PIN</div>
         <input value={newPin} onChange={e=>setNewPin(e.target.value)} placeholder="New 4-digit PIN" type="password" maxLength={4} style={iS}/>
@@ -1462,6 +1454,10 @@ function LeadApp({div,onBack,demoMode,onToggleDemo}){
     if(!demoMode&&nexusKey){try{const r=await fetch(`https://frc.nexus/api/v1/event/${NEXUS_EVENT}`,{headers:{"Nexus-Api-Key":nexusKey}});if(r.ok)setNexusData(await r.json());else errs.push(`Nexus ${r.status}`);}catch{errs.push("Nexus failed");}}
     if(errs.length)setError(errs.join(" · "));setLoading(false);
   },[nexusKey,demoMode]);
+
+  // Auto-fetch schedule on mount
+  const hasFetched=useRef(false);
+  useEffect(()=>{if(!hasFetched.current){hasFetched.current=true;fetchAll();}},[fetchAll]);
 
   useEffect(()=>{if(tbaMatches.length===0)return;const t=setInterval(()=>{const tk=demoMode?DEMO_TBA_TEAM:TEAM_KEY,ek=demoMode?DEMO_TBA_EVENT:EVENT_KEY;fetch(`https://www.thebluealliance.com/api/v3/team/${tk}/event/${ek}/matches`,{headers:{"X-TBA-Auth-Key":TBA_KEY}}).then(r=>r.ok?r.json():null).then(d=>{if(d)setTBA(d);});}
   ,5*60*1000);return()=>clearInterval(t);},[tbaMatches.length,demoMode]);
