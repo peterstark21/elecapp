@@ -367,8 +367,8 @@ const SW_SECTIONS = [
 // ╚══════════════════════════════════════════════════════════════════════════════╝
 
 const DIVISION_SECTIONS = { elec: ELEC_SECTIONS, mech: MECH_SECTIONS, sw: SW_SECTIONS };
-const getAllItems = (div,hidden) => {const items=(DIVISION_SECTIONS[div]||[]).flatMap(s=>s.items);return hidden?items.filter(i=>!hidden.has(i.id)):items;};
-const getCritItems = (div,hidden) => getAllItems(div,hidden).filter(i=>i.priority==="CRITICAL");
+const getAllItemsStatic = (div,hidden) => {const items=(DIVISION_SECTIONS[div]||[]).flatMap(s=>s.items);return hidden?items.filter(i=>!hidden.has(i.id)):items;};
+const getCritItemsStatic = (div,hidden) => getAllItemsStatic(div,hidden).filter(i=>i.priority==="CRITICAL");
 const filterSections = (div,hidden) => {
   if(!hidden||!hidden.size)return DIVISION_SECTIONS[div]||[];
   return (DIVISION_SECTIONS[div]||[]).map(s=>({...s,items:s.items.filter(i=>!hidden.has(i.id))})).filter(s=>s.items.length>0);
