@@ -900,6 +900,9 @@ function ChecklistTab({div,nexusData,tbaMatches,autoMatch,demoMode}){
   const doMarkAll=async()=>{
     const all=allIds.reduce((a,id)=>({...a,[id]:true}),{});
     setChecked(all);await ss(sKey(),{checked:all,updatedBy:lead||"unknown",division:div,updatedAt:Date.now()});setMarkAll(false);};
+  const markSection=async(ids)=>{
+    const allSection=ids.reduce((a,id)=>({...a,[id]:true}),{});
+    setChecked(allSection);await ss(sKey(),{checked:allSection,updatedBy:lead||"unknown",division:div,updatedAt:Date.now()});};
   const doReset=async()=>{setChecked({});setMsg("");await ss(sKey(),{checked:{},updatedBy:lead||"unknown",division:div,updatedAt:Date.now()});};
   const doSubmit=async(quickMode=false)=>{
     if(!allCrit){setMsg("⚠️ Complete all critical items first.");return;}
