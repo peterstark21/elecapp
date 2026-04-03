@@ -40,18 +40,18 @@ const CONFIG = {
 // ╚══════════════════════════════════════════════════════════════════════════════╝
 
 const SK = {
-  elec:     "frc115_cl_elec_v7",
-  mech:     "frc115_cl_mech_v7",
-  sw:       "frc115_cl_sw_v7",
-  archElec: "frc115_arch_elec_v7",
-  archMech: "frc115_arch_mech_v7",
-  archSW:   "frc115_arch_sw_v7",
-  archDemo: "frc115_arch_demo_v7",
-  announce: "frc115_announce_v3",
-  issues:   "frc115_issues_v3",
-  nexus:    "frc115_nexus_key_v2",
-  dirPin:   "frc115_dir_pin_v2",
-  dirItems: "frc115_dir_items_v1",
+  elec:     "frc115_cl_elec_v6",
+  mech:     "frc115_cl_mech_v6",
+  sw:       "frc115_cl_sw_v6",
+  archElec: "frc115_arch_elec_v6",
+  archMech: "frc115_arch_mech_v6",
+  archSW:   "frc115_arch_sw_v6",
+  archDemo: "frc115_arch_demo_v6",
+  announce: "frc115_announce_v2",
+  issues:   "frc115_issues_v2",
+  nexus:    "frc115_nexus_key_v1",
+  dirPin:   "frc115_dir_pin_v1",
+  hiddenItems: "frc115_hidden_items_v1",
 };
 
 // Which keys get synced to Upstash (for cross-device sync)
@@ -219,127 +219,68 @@ const PC = {
 // ╚══════════════════════════════════════════════════════════════════════════════╝
 
 const ELEC_SECTIONS = [
-  { id: "power", title: "⚡ Power & Battery", color: "#b91c1c", bg: "#fef2f2", items: [
-    { id: "p1", priority: "CRITICAL", text: "Battery fully charged (≥ 12.0V)", note: "Use Battery Beak — ideally 12.8V+" },
-    { id: "p2", priority: "CRITICAL", text: "Anderson PowerPole battery connector fully seated & locked", note: "Tug test — zero give" },
-    { id: "p3", priority: "CRITICAL", text: "120A main breaker ON and reset (button fully out)", note: "Press to reset if tripped" },
-    { id: "p4", priority: "CRITICAL", text: "Circuit breaker tight — no loose nuts or corrosion", note: "Corrosion causes voltage drop" },
-    { id: "p5", priority: "CRITICAL", text: "Battery secured in mount", note: "Must not move under hard acceleration" },
-    { id: "p6", priority: "CRITICAL", text: "Main power leads (red/black) have no exposed copper", note: "Inspect ferrule crimp ends and full wire run" },
-    { id: "p7", priority: "HIGH", text: "REV PDH 2.0 (main) mounted firmly — no flex or wobble", note: "Main PDH handles CAN termination and voltage display" },
-    { id: "p8", priority: "HIGH", text: "REV PDH 2.0 voltage display reading 12.0–13.0V", note: "Only PDH with display — blue digits stable and visible" },
-    { id: "p9", priority: "HIGH", text: "All REV PDH 2.0 breaker slots occupied or blanked", note: "Open ports = short circuit risk" },
-    { id: "p10", priority: "HIGH", text: "REV PDH 2.0 ferrule crimp power input fully seated — tug tested", note: "Partial insertion = full power loss" },
-    { id: "p11", priority: "HIGH", text: "Mini PDH #1 mounted firmly and power input ferrule crimps fully seated", note: "Mini PDHs have no display — physical check only" },
-    { id: "p12", priority: "HIGH", text: "Mini PDH #2 mounted firmly and power input ferrule crimps fully seated", note: "Tug both input leads" },
-    { id: "p13", priority: "MEDIUM", text: "All three PDH breaker ratings match assigned device requirements", note: "Verify no breakers swapped between matches" },
+  {id:"power",title:"⚡ Power & Battery",color:"#b91c1c",bg:"#fef2f2",items:[
+    {id:"p1",priority:"CRITICAL",text:"Battery charged ≥ 120% and secured in mount",note:"Battery Beak — ideally 130%+; must not move under acceleration"},
+    {id:"p2",priority:"CRITICAL",text:"Anderson PowerPole seated & locked — tug tested",note:null},
+    {id:"p3",priority:"CRITICAL",text:"120A main breaker ON and reset",note:"Button fully out; press to reset if tripped"},
+    {id:"p4",priority:"CRITICAL",text:"Main power leads — no exposed copper, ferrules intact",note:null},
+    {id:"p5",priority:"HIGH",text:"REV PDH 2.0 mounted firm, voltage 12.0–13.0V, all slots occupied/blanked",note:"Main PDH — blue digits stable"},
+    {id:"p6",priority:"HIGH",text:"Both Mini PDHs mounted firm, power ferrules tug tested",note:"No display — physical check only"},
+    {id:"p7",priority:"MEDIUM",text:"PDH breaker ratings match assigned devices",note:null},
   ]},
-  { id: "roborio", title: "🖥️ RoboRIO 2.0 & Radio", color: "#1d4ed8", bg: "#eff6ff", items: [
-    { id: "r1", priority: "CRITICAL", text: "RoboRIO STATUS light solid green, COMM light green", note: "Solid red/orange = fault; investigate before queue" },
-    { id: "r2", priority: "CRITICAL", text: "RSL connected and blinking orange", note: "Required by rules — blinking = enabled" },
-    { id: "r3", priority: "CRITICAL", text: "Radio powered — COMM LED green", note: "Confirm correct team number config" },
-    { id: "r4", priority: "CRITICAL", text: "Ethernet cable RoboRIO ↔ radio fully seated on both ends", note: "Click-lock test; half-seated = no comms" },
-    { id: "r5", priority: "HIGH", text: "RoboRIO power ferrule crimps fully seated — tug tested", note: "Loose ferrule = brownout entire RIO" },
-    { id: "r6", priority: "HIGH", text: "Radio power cable firmly connected", note: "Common transport damage point" },
-    { id: "r7", priority: "HIGH", text: "CANivore USB cable to RoboRIO strain-relieved and seated", note: "This is the entire drivetrain CAN backbone" },
-    { id: "r8", priority: "MEDIUM", text: "RoboRIO mounting screws tight — no vibration movement", note: "Loose RIO = intermittent ground faults" },
+  {id:"roborio",title:"🖥️ RoboRIO & Radio",color:"#1d4ed8",bg:"#eff6ff",items:[
+    {id:"r1",priority:"CRITICAL",text:"RoboRIO STATUS green, COMM green, RSL blinking orange",note:"Red/orange = fault; investigate before queue"},
+    {id:"r2",priority:"CRITICAL",text:"Radio powered — COMM LED green",note:null},
+    {id:"r3",priority:"CRITICAL",text:"Ethernet RoboRIO ↔ radio click-locked both ends",note:null},
+    {id:"r4",priority:"HIGH",text:"RoboRIO & radio power ferrules tug tested",note:null},
+    {id:"r5",priority:"HIGH",text:"CANivore USB to RoboRIO strain-relieved and seated",note:"Entire drivetrain CAN backbone"},
   ]},
-  { id: "can", title: "🔌 CAN Bus", color: "#15803d", bg: "#f0fdf4", items: [
-    { id: "c1", priority: "CRITICAL", text: "Standalone 120Ω termination resistor seated at open end of CAN chain", note: "Tug test JST — can vibrate loose" },
-    { id: "c2", priority: "CRITICAL", text: "CAN chain end at REV PDH fully plugged in", note: "PDH provides built-in 120Ω — Mini PDHs have no CAN ports" },
-    { id: "c3", priority: "CRITICAL", text: "No CAN wire pinched in cross rails or pivot zones", note: "Walk full CAN run; pinched wire fails under vibration" },
-    { id: "c4", priority: "CRITICAL", text: "Kraken X60 #1 (FL drive) CAN connector seated — tug tested", note: "One loose joint drops all downstream devices" },
-    { id: "c5", priority: "CRITICAL", text: "Kraken X60 #2 (FR drive) CAN connector seated — tug tested", note: null },
-    { id: "c6", priority: "CRITICAL", text: "Kraken X60 #3 (BL drive) CAN connector seated — tug tested", note: null },
-    { id: "c7", priority: "CRITICAL", text: "Kraken X60 #4 (BR drive) CAN connector seated — tug tested", note: null },
-    { id: "c8", priority: "CRITICAL", text: "Falcon 500 #1 (FL turn) CAN connector seated — tug tested", note: "Falcon CAN loosens under vibration" },
-    { id: "c9", priority: "CRITICAL", text: "Falcon 500 #2 (FR turn) CAN connector seated — tug tested", note: null },
-    { id: "c10", priority: "CRITICAL", text: "Falcon 500 #3 (BL turn) CAN connector seated — tug tested", note: null },
-    { id: "c11", priority: "CRITICAL", text: "Falcon 500 #4 (BR turn) CAN connector seated — tug tested", note: null },
-    { id: "c12", priority: "CRITICAL", text: "CANcoder #1 (FL steer) seated", note: "Lost CANcoder = wrong wheel angle = dangerous enable" },
-    { id: "c13", priority: "CRITICAL", text: "CANcoder #2 (FR steer) seated", note: null },
-    { id: "c14", priority: "CRITICAL", text: "CANcoder #3 (BL steer) seated", note: null },
-    { id: "c15", priority: "CRITICAL", text: "CANcoder #4 (BR steer) seated", note: null },
-    { id: "c16", priority: "CRITICAL", text: "Pigeon 2.0 CAN connector seated — tug tested", note: "Lost Pigeon = no field-centric drive" },
-    { id: "c17", priority: "HIGH", text: "Kraken X60 #1 LED — solid orange, no fault blink", note: "Rapid red blink = fault; check Tuner X" },
-    { id: "c18", priority: "HIGH", text: "Kraken X60 #2 LED — no fault blink", note: null },
-    { id: "c19", priority: "HIGH", text: "Kraken X60 #3 LED — no fault blink", note: null },
-    { id: "c20", priority: "HIGH", text: "Kraken X60 #4 LED — no fault blink", note: null },
-    { id: "c21", priority: "HIGH", text: "Falcon 500 #1 LED — no fault blink", note: null },
-    { id: "c22", priority: "HIGH", text: "Falcon 500 #2 LED — no fault blink", note: null },
-    { id: "c23", priority: "HIGH", text: "Falcon 500 #3 LED — no fault blink", note: null },
-    { id: "c24", priority: "HIGH", text: "Falcon 500 #4 LED — no fault blink", note: null },
-    { id: "c25", priority: "HIGH", text: "CANcoder #1 LED — solid or slow blink, no fast fault blink", note: null },
-    { id: "c26", priority: "HIGH", text: "CANcoder #2 LED — no fast fault blink", note: null },
-    { id: "c27", priority: "HIGH", text: "CANcoder #3 LED — no fast fault blink", note: null },
-    { id: "c28", priority: "HIGH", text: "CANcoder #4 LED — no fast fault blink", note: null },
-    { id: "c29", priority: "HIGH", text: "Pigeon 2.0 LED — boot-complete pattern after power-on", note: "Rapid blink = IMU fault" },
-    { id: "c30", priority: "HIGH", text: "CANivore LED — solid green after boot", note: "Red/off = USB issue; re-seat USB to RoboRIO" },
-    { id: "c31", priority: "HIGH", text: "All CAN device IDs unique — no conflicts in Tuner X", note: "Duplicate IDs = unpredictable behavior" },
-    { id: "c32", priority: "HIGH", text: "All CAN devices visible in Tuner X with no active faults", note: "Any red entry = do not queue" },
-    { id: "c33", priority: "MEDIUM", text: "CAN bus utilization below 90%", note: "High utilization = delayed motor commands" },
+  {id:"can",title:"🔌 CAN Bus",color:"#15803d",bg:"#f0fdf4",items:[
+    {id:"c1",priority:"CRITICAL",text:"120Ω termination resistor seated at open end + PDH end plugged in",note:"Tug test JST — can vibrate loose"},
+    {id:"c2",priority:"CRITICAL",text:"No CAN wire pinched in cross rails or pivot zones",note:"Walk full CAN run"},
+    {id:"c3",priority:"CRITICAL",text:"All 4 Kraken (drive) CAN connectors seated — tug tested",note:"One loose joint drops all downstream"},
+    {id:"c4",priority:"CRITICAL",text:"All 4 Falcon (turn) CAN connectors seated — tug tested",note:null},
+    {id:"c5",priority:"CRITICAL",text:"All 4 CANcoders seated — tug tested",note:"Lost CANcoder = wrong wheel angle"},
+    {id:"c6",priority:"CRITICAL",text:"Pigeon 2.0 CAN connector seated — tug tested",note:null},
+    {id:"c7",priority:"HIGH",text:"All motor & CANcoder LEDs normal — no fault blinks",note:"Rapid red = fault; check Tuner X"},
+    {id:"c8",priority:"HIGH",text:"CANivore LED solid green, Pigeon boot-complete",note:null},
+    {id:"c9",priority:"HIGH",text:"All CAN devices visible in Tuner X — no conflicts or faults",note:"Any red entry = do not queue"},
+    {id:"c10",priority:"MEDIUM",text:"CAN bus utilization below 90%",note:null},
   ]},
-  { id: "swerve", title: "🌀 Swerve Drive (×4)", color: "#7e22ce", bg: "#faf5ff", items: [
-    { id: "s1", priority: "CRITICAL", text: "All 4 Kraken X60 power connectors fully seated — tug tested", note: "Check at PDH and at motor" },
-    { id: "s2", priority: "CRITICAL", text: "All 4 Falcon 500 power connectors fully seated — tug tested", note: "Falcons loosen under vibration" },
-    { id: "s3", priority: "CRITICAL", text: "All 4 CANcoder connectors secure on steer modules", note: "Loose = incorrect wheel angle on enable" },
-    { id: "s4", priority: "CRITICAL", text: "All 4 CANcoder absolute positions correct", note: "Verify in Tuner X — bad offsets = unsafe enable" },
-    { id: "s5", priority: "CRITICAL", text: "No motor wires in swerve rotation path — free flex through full range", note: "Rotate each module by hand and watch wires" },
-    { id: "s6", priority: "HIGH", text: "All 4 Kraken LEDs — no fault pattern", note: "Check Phoenix Tuner X" },
-    { id: "s7", priority: "HIGH", text: "All 4 Falcon LEDs — no fault pattern", note: "Check Phoenix Tuner X" },
-    { id: "s8", priority: "HIGH", text: "Spin each motor by hand — no grinding or resistance", note: "Binding = overcurrent in-match" },
-    { id: "s9", priority: "MEDIUM", text: "Swerve module mounting bolts tight", note: "Loose modules = steering angle drift" },
-    { id: "s10", priority: "MEDIUM", text: "Krakens and Falcons cool to touch", note: "Too hot = thermal issue; check airflow" },
+  {id:"swerve",title:"🌀 Swerve Drive (×4)",color:"#7e22ce",bg:"#faf5ff",items:[
+    {id:"s1",priority:"CRITICAL",text:"All 8 motor power connectors (4 Kraken + 4 Falcon) tug tested",note:"Check at PDH and at motor"},
+    {id:"s2",priority:"CRITICAL",text:"All 4 CANcoder absolute positions correct in Tuner X",note:"Bad offsets = unsafe enable"},
+    {id:"s3",priority:"CRITICAL",text:"No wires in swerve rotation path — full range clear",note:"Rotate each module by hand"},
+    {id:"s4",priority:"HIGH",text:"Spin each motor by hand — no grinding or resistance",note:"Binding = overcurrent in-match"},
+    {id:"s5",priority:"MEDIUM",text:"Module bolts tight, motors cool to touch",note:null},
   ]},
-  { id: "pigeon", title: "📡 Pigeon 2.0", color: "#0f766e", bg: "#f0fdfa", items: [
-    { id: "g1", priority: "CRITICAL", text: "Pigeon 2.0 rigidly mounted — zero looseness", note: "IMU movement corrupts heading for field-centric drive" },
-    { id: "g2", priority: "CRITICAL", text: "Pigeon CAN and power connections seated — tug tested", note: "JST connector" },
-    { id: "g3", priority: "HIGH", text: "Pigeon heading reads 0° after yaw reset", note: "Reset before each match" },
-    { id: "g4", priority: "MEDIUM", text: "Pigeon firmware current (check Tuner X)", note: null },
+  {id:"pigeon",title:"📡 Pigeon & Limelight",color:"#0f766e",bg:"#f0fdfa",items:[
+    {id:"g1",priority:"CRITICAL",text:"Pigeon rigidly mounted, CAN + power seated — tug tested",note:"IMU movement corrupts heading"},
+    {id:"g2",priority:"CRITICAL",text:"Limelight power seated (LED ring on) + Ethernet click-locked",note:null},
+    {id:"g3",priority:"HIGH",text:"Pigeon heading 0° after yaw reset",note:"Reset before each match"},
+    {id:"g4",priority:"HIGH",text:"Limelight reachable on network, mounting rigid",note:"ping limelight.local"},
+    {id:"g5",priority:"MEDIUM",text:"Correct vision pipeline selected, lens clean",note:null},
   ]},
-  { id: "limelight", title: "📷 Limelight", color: "#166534", bg: "#f0fdf4", items: [
-    { id: "l1", priority: "CRITICAL", text: "Limelight power cable fully seated — LED ring on at boot", note: "Check green status LED" },
-    { id: "l2", priority: "CRITICAL", text: "Limelight Ethernet fully clicked in to network switch", note: "Required for vision data" },
-    { id: "l3", priority: "HIGH", text: "Limelight mounting rigid — bracket bolts tight", note: "Camera angle shift corrupts targeting" },
-    { id: "l4", priority: "HIGH", text: "Limelight reachable on network (ping limelight.local)", note: "No network = no auto vision" },
-    { id: "l5", priority: "MEDIUM", text: "Correct pipeline selected for current game mode", note: null },
-    { id: "l6", priority: "MEDIUM", text: "Camera lens clean �� no smudges or debris", note: "Quick microfiber wipe before queue" },
+  {id:"connections",title:"🔗 Connections & Wiring",color:"#92400e",bg:"#fffbeb",items:[
+    {id:"cn1",priority:"CRITICAL",text:"Tug test ALL PowerPole + ferrule crimp connections",note:"Any movement = re-crimp before queuing"},
+    {id:"cn2",priority:"CRITICAL",text:"No blackened, burned, or melted connectors",note:"Discoloration = arcing"},
+    {id:"cn3",priority:"CRITICAL",text:"No wires near spinning mechanisms, belts, or chain",note:"Walk every mechanism"},
+    {id:"cn4",priority:"CRITICAL",text:"Conduit exits capped, cross-rail clips intact, wires flush",note:"Popped clip = wires drop into moving parts"},
+    {id:"cn5",priority:"HIGH",text:"Wago levers closed, Ethernet click-locked, no exposed strands",note:null},
+    {id:"cn6",priority:"HIGH",text:"Zip ties tight/trimmed, all runs have service loop",note:"Tight wire = broken ferrule after collision"},
+    {id:"cn7",priority:"MEDIUM",text:"Visual sweep for chafe, corrosion, or loose screws near board",note:null},
   ]},
-  { id: "connections", title: "🔗 Connection Integrity", color: "#92400e", bg: "#fffbeb", items: [
-    { id: "cn1", priority: "CRITICAL", text: "Tug test ALL PowerPole connectors — none pull loose", note: "Battery, main PDH, both Mini PDHs, all branches" },
-    { id: "cn2", priority: "CRITICAL", text: "Tug test ALL ferrule crimp ends", note: "Any movement = re-crimp before queuing" },
-    { id: "cn3", priority: "CRITICAL", text: "No blackened, burned, or melted connectors", note: "Discoloration = arcing; fix root cause" },
-    { id: "cn4", priority: "HIGH", text: "All Wago lever connectors fully closed", note: "Check lever is fully down" },
-    { id: "cn5", priority: "HIGH", text: "All RJ45 Ethernet connectors click-lock tested", note: "RoboRIO, radio, Limelight" },
-    { id: "cn6", priority: "HIGH", text: "No exposed bare wire strands outside connectors", note: "Stray strands = short circuit" },
-    { id: "cn7", priority: "MEDIUM", text: "Ferrule crimps show no green corrosion or blackening", note: "Discoloration = heat damage" },
+  {id:"motors",title:"⚙️ Motor Function Check",color:"#be185d",bg:"#fdf2f8",items:[
+    {id:"m1",priority:"CRITICAL",text:"Enable — all 4 swerve modules respond, correct direction",note:"Each wheel should steer and drive correctly"},
+    {id:"m2",priority:"CRITICAL",text:"No motor faults or brownouts on enable",note:"Tuner X red entries = do not queue"},
+    {id:"m3",priority:"HIGH",text:"Mechanism motors respond, no unusual sounds",note:"Run full range in pits"},
+    {id:"m4",priority:"HIGH",text:"Battery stays above 11.0V during full enable",note:"Below 10.5V = brownout risk"},
   ]},
-  { id: "motors", title: "⚙️ Motor Function Check", color: "#be185d", bg: "#fdf2f8", items: [
-    { id: "m1", priority: "CRITICAL", text: "Enable robot — all 4 swerve modules respond to joystick", note: "Each wheel should steer and drive correctly" },
-    { id: "m2", priority: "CRITICAL", text: "All 4 Krakens spin in correct direction", note: "Verify in Phoenix Tuner X if unsure" },
-    { id: "m3", priority: "CRITICAL", text: "All 4 Falcons respond and hold wheel angle", note: "Wheel resists manual rotation when enabled" },
-    { id: "m4", priority: "CRITICAL", text: "No motor throws a fault or brownout on enable", note: "Tuner X red entries = do not queue" },
-    { id: "m5", priority: "HIGH", text: "All mechanism motors respond to test commands", note: "Run full range in pits" },
-    { id: "m6", priority: "HIGH", text: "No unusual sounds from any motor", note: "Listen during pit enable" },
-    { id: "m7", priority: "HIGH", text: "Battery voltage stays above 11.0V during full drivetrain enable", note: "Below 10.5V = brownout risk" },
-  ]},
-  { id: "wiremgmt", title: "🔒 Wire Management", color: "#374151", bg: "#f9fafb", items: [
-    { id: "w1", priority: "CRITICAL", text: "No wires near spinning mechanisms, belts, pulleys, or chain", note: "Walk every drivetrain mechanism" },
-    { id: "w2", priority: "CRITICAL", text: "All corrugated conduit exits capped or taped", note: "Conduit exits = highest-wear points" },
-    { id: "w3", priority: "CRITICAL", text: "All 3D printed cross rail snap-in clips snapped in — none cracked", note: "Popped clip = wires drop into moving parts" },
-    { id: "w4", priority: "CRITICAL", text: "All wires seated flush inside cross rail channels", note: "Wire above edge catches on mechanisms" },
-    { id: "w5", priority: "HIGH", text: "Inspect clips for cracks — replace any damaged ones", note: "Cracked tabs create sharp points" },
-    { id: "w6", priority: "HIGH", text: "All zip ties tight and trimmed — no protruding tails", note: "Tails snag wires under vibration" },
-    { id: "w7", priority: "HIGH", text: "No wire under tension — all runs have service loop", note: "Tight wire = broken ferrule after collision" },
-    { id: "w8", priority: "SECONDARY", text: "Visual sweep for new wire chafe from last match", note: null },
-    { id: "w9", priority: "SECONDARY", text: "No loose screws near electrical board", note: "Metal screw on live PDH = fire" },
-  ]},
-  { id: "signoff", title: "✅ Pre-Queue Sign-Off", color: "#1f2937", bg: "#f8fafc", items: [
-    { id: "f1", priority: "CRITICAL", text: "Robot boots — RIO STATUS green, radio COMM green, RSL blinking", note: "All three must be correct" },
-    { id: "f2", priority: "CRITICAL", text: "Driver Station shows robot enabled, all CAN devices visible, no faults", note: "Tuner X must be all green" },
-    { id: "f3", priority: "HIGH", text: "Bumpers on or confirmed at queue", note: "OK to install at queue line" },
-    { id: "f4", priority: "HIGH", text: "Spare battery on charger for next match", note: "Never queue without charged spare" },
-    { id: "f5", priority: "HIGH", text: "Electrical lead has verbally signed off", note: "Two-person verification recommended" },
+  {id:"signoff",title:"✅ Pre-Queue Sign-Off",color:"#1f2937",bg:"#f8fafc",items:[
+    {id:"f1",priority:"CRITICAL",text:"Robot boots — RIO green, radio green, RSL blinking, DS enabled",note:"Tuner X must be all green"},
+    {id:"f2",priority:"HIGH",text:"Bumpers on or confirmed at queue",note:null},
+    {id:"f3",priority:"HIGH",text:"Spare battery on charger",note:null},
+    {id:"f4",priority:"HIGH",text:"Electrical lead has signed off",note:"Two-person verification recommended"},
   ]},
 ];
 
@@ -383,9 +324,8 @@ const MECH_SECTIONS = [
   { id: "mech_limelight", title: "📷 Limelight Mount", color: "#166534", bg: "#f0fdf4", items: [
     { id: "ml1", priority: "HIGH", text: "Limelight mounting screws + nuts tight", note: "Camera angle shift corrupts targeting" },
   ]},
-  { id: "mech_signoff", title: "✅ Mechanical Sign-Off", color: "#1f2937", bg: "#f8fafc", items: [
-    { id: "mso1", priority: "CRITICAL", text: "Mechanical lead has verified robot is ready to compete", note: null },
-    { id: "mso2", priority: "HIGH", text: "All safety pins and locks removed before enable", note: null },
+  {id:"mech_signoff",title:"✅ Mechanical Sign-Off",color:"#1f2937",bg:"#f8fafc",items:[
+    {id:"ms1",priority:"CRITICAL",text:"Mechanical lead has verified robot is ready to compete",note:null},
   ]},
 ];
 
@@ -416,348 +356,87 @@ const SW_SECTIONS = [
 // ╚══════════════════════════════════════════════════════════════════════════════╝
 
 const DIVISION_SECTIONS = { elec: ELEC_SECTIONS, mech: MECH_SECTIONS, sw: SW_SECTIONS };
-
-function useDivisionSections(div) {
-  const [dirItems, setDirItems] = useState([]);
-
-  useEffect(() => {
-    const poll = async () => {
-      const items = await ls(SK.dirItems);
-      setDirItems(Array.isArray(items) ? items : []);
-    };
-    poll();
-    const t = setInterval(poll, 5000);
-    return () => clearInterval(t);
-  }, []);
-
-  return useMemo(() => {
-    const baseSections = DIVISION_SECTIONS[div] || [];
-    const divCustom = dirItems.filter(i => i.division === div);
-    if (divCustom.length === 0) return baseSections;
-
-    const customSection = {
-      id: "dir_custom",
-      title: "🎛️ Director Items",
-      color: "#9333ea",
-      bg: "#faf5ff",
-      items: divCustom.map(i => ({
-        id: i.id,
-        priority: i.priority || "HIGH",
-        text: i.text,
-        note: i.note || "Added by director",
-      })),
-    };
-    return [...baseSections, customSection];
-  }, [div, dirItems]);
-}
-
-const getAllItemsStatic = (div) => (DIVISION_SECTIONS[div] || []).flatMap(s => s.items);
-const getCritItemsStatic = (div) => getAllItemsStatic(div).filter(i => i.priority === "CRITICAL");
-
-const getAllItemsFromSections = (sections) => sections.flatMap(s => s.items);
-const getCritItemsFromSections = (sections) => getAllItemsFromSections(sections).filter(i => i.priority === "CRITICAL");
-
-
-// ╔══════════════════════════════════════════════════════════════════════════════╗
-// ║  SECTION 7: UTILITY FUNCTIONS                                                ║
-// ╚══════════════════════════════════════════════════════════════════════════════╝
-
-const fmtTime = (ms) => !ms ? "TBD" : new Date(ms).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-const fmtDate = (ms) => !ms ? "" : new Date(ms).toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" });
-const fmtDT = (ms) => !ms ? "" : new Date(ms).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
-const asArray = (v) => Array.isArray(v) ? v : [];
-
-const fmtCD = (ms) => {
-  const s = Math.abs(ms) / 1000;
-  const h = Math.floor(s / 3600);
-  const m = Math.floor((s % 3600) / 60);
-  const sc = Math.floor(s % 60);
-  return h > 0
-    ? `${h}h ${String(m).padStart(2, "0")}m ${String(sc).padStart(2, "0")}s`
-    : `${String(m).padStart(2, "0")}m ${String(sc).padStart(2, "0")}s`;
+const getAllItems = (div,hidden) => {const items=(DIVISION_SECTIONS[div]||[]).flatMap(s=>s.items);return hidden?items.filter(i=>!hidden.has(i.id)):items;};
+const getCritItems = (div,hidden) => getAllItems(div,hidden).filter(i=>i.priority==="CRITICAL");
+const filterSections = (div,hidden) => {
+  if(!hidden||!hidden.size)return DIVISION_SECTIONS[div]||[];
+  return (DIVISION_SECTIONS[div]||[]).map(s=>({...s,items:s.items.filter(i=>!hidden.has(i.id))})).filter(s=>s.items.length>0);
 };
-
-const getTS = (m) => m?.predicted_time || m?.time || null;
-const mLbl = (m) => {
-  if (!m) return "";
-  return `${m.comp_level === "qm" ? "Q" : m.comp_level === "sf" ? "SF" : "F"}${m.match_number}`;
-};
-const getAl = (m, c) => (m?.alliances?.[c]?.team_keys || []).map(k => k.replace("frc", ""));
-
-function useNow(ms = 1000) {
-  const [now, setNow] = useState(Date.now());
-  useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), ms);
-    return () => clearInterval(t);
-  }, [ms]);
-  return now;
+function useHiddenItems(){
+  const [hidden,setHidden]=useState(new Set());
+  useEffect(()=>{ls(SK.hiddenItems).then(d=>{if(Array.isArray(d))setHidden(new Set(d));});},[]);
+  const toggle=useCallback(async(id)=>{
+    setHidden(prev=>{const next=new Set(prev);if(next.has(id))next.delete(id);else next.add(id);
+      ss(SK.hiddenItems,[...next]);return next;});
+  },[]);
+  return{hidden,toggle};
 }
 
-// ╔══════════════════════════════════════════════════════════════════════════════╗
-// ║  SECTION 8: MATCH / NEXUS HELPERS                                            ║
-// ╚══════════════════════════════════════════════════════════════════════���═══════╝
 
-function parseNexusLabel(lbl = "") {
-  if (!lbl) return null;
-  const l = lbl.toLowerCase();
-  if (l.startsWith("qualification")) return { level: "qm", num: parseInt(l.replace(/\D/g, "")) || 0 };
-  if (l.startsWith("playoff")) return { level: "sf", num: parseInt(l.replace(/\D/g, "")) || 0 };
-  if (l.startsWith("final")) return { level: "f", num: parseInt(l.replace(/\D/g, "")) || 0 };
-  return null;
-}
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+const fmtTime = ms=>!ms?"TBD":new Date(ms).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+const fmtDate = ms=>!ms?"":new Date(ms).toLocaleDateString([],{weekday:"short",month:"short",day:"numeric"});
+const fmtDT   = ms=>!ms?"":new Date(ms).toLocaleString([],{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
+const asArray = (v)=>Array.isArray(v)?v:[];
+const fmtCD   = ms=>{const s=Math.abs(ms)/1000,h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sc=Math.floor(s%60);
+  return h>0?`${h}h ${String(m).padStart(2,"0")}m ${String(sc).padStart(2,"0")}s`:`${String(m).padStart(2,"0")}m ${String(sc).padStart(2,"0")}s`;};
+const getTS = m=>m?.predicted_time||m?.time||null;
+const mLbl  = m=>{if(!m)return"";return`${m.comp_level==="qm"?"Q":m.comp_level==="sf"?"SF":"F"}${m.match_number}`};
+const getAl = (m,c)=>(m?.alliances?.[c]?.team_keys||[]).map(k=>k.replace("frc",""));
 
-const matchLabelFromParsed = (p) => !p ? "" : p.level === "qm" ? `Q${p.num}` : p.level === "sf" ? `SF${p.num}` : `F${p.num}`;
+function useNow(ms=1000){
+  const [now,setNow]=useState(Date.now());
+  useEffect(()=>{const t=setInterval(()=>setNow(Date.now()),ms);return()=>clearInterval(t);},[ms]);
+  return now;}
 
-function findNexusMatch(nx = [], parsed) {
-  if (!parsed) return null;
-  return nx.find(m => {
-    const p = parseNexusLabel(m.label);
-    return p && p.level === parsed.level && p.num === parsed.num;
-  }) || null;
-}
+function parseNexusLabel(lbl=""){
+  if(!lbl)return null;const l=lbl.toLowerCase();
+  if(l.startsWith("qualification"))return{level:"qm",num:parseInt(l.replace(/\D/g,""))||0};
+  if(l.startsWith("playoff"))return{level:"sf",num:parseInt(l.replace(/\D/g,""))||0};
+  if(l.startsWith("final"))return{level:"f",num:parseInt(l.replace(/\D/g,""))||0};
+  return null;}
+const matchLabelFromParsed=p=>!p?"":p.level==="qm"?`Q${p.num}`:p.level==="sf"?`SF${p.num}`:`F${p.num}`;
+function findNexusMatch(nx=[],parsed){if(!parsed)return null;
+  return nx.find(m=>{const p=parseNexusLabel(m.label);return p&&p.level===parsed.level&&p.num===parsed.num;})||null;}
+function findQueueTrigger(nx=[],ourM){if(!ourM)return null;
+  const idx=nx.findIndex(m=>m.label===ourM.label);if(idx<0)return null;
+  return idx>=2?nx[idx-2]:nx[0]!==ourM?nx[0]:null;}
+function bestMatchTime(nxM,tbaM){
+  if(nxM?.times?.estimatedStartTime)return nxM.times.estimatedStartTime;
+  const t=getTS(tbaM);return t?t*1000:null;}
+function bestQueueTime(trigNx,ourMs){
+  if(trigNx?.times?.estimatedStartTime)return trigNx.times.estimatedStartTime;
+  return ourMs?ourMs-10*60*1000:null;}
+function getAlliances(nxM,tbaM){
+  const red=nxM?(nxM.redTeams||[]):getAl(tbaM,"red");
+  const blue=nxM?(nxM.blueTeams||[]):getAl(tbaM,"blue");
+  const mc=red.includes(TEAM_NUM)?"red":"blue";
+  return{myColor:mc,partners:(mc==="red"?red:blue).filter(t=>t!==TEAM_NUM),opponents:mc==="red"?blue:red};}
+function nexusSS(status){if(!status)return null;const s=status.toLowerCase();
+  if(s.includes("queuing"))return{bg:"#fef9c3",text:"#854d0e",label:status};
+  if(s.includes("deck"))return{bg:"#ffedd5",text:"#9a3412",label:status};
+  if(s.includes("field"))return{bg:"#fee2e2",text:"#991b1b",label:status};
+  if(s.includes("complete"))return{bg:"#f1f5f9",text:"#64748b",label:status};
+  return{bg:"#eff6ff",text:"#1d4ed8",label:status};}
 
-function findQueueTrigger(nx = [], ourM) {
-  if (!ourM) return null;
-  const idx = nx.findIndex(m => m.label === ourM.label);
-  if (idx < 0) return null;
-  return idx >= 2 ? nx[idx - 2] : (nx[0] !== ourM ? nx[0] : null);
-}
+async function sendEmail(mLabel,leadName,div,completed,total,quickMode){
+  const url="https://api.emailjs.com/api/v1.0/email/send";
+  const payload={service_id:EJS_SERVICE,template_id:EJS_TEMPLATE,user_id:EJS_PUBKEY,
+    accessToken:EJS_PUBKEY,
+    template_params:{to_email:NOTIFY_EMAIL,team_number:"115",match_label:mLabel,
+      lead_name:`${leadName||"Unknown"} (${div})`,completed:String(completed),total:String(total),
+      submitted_time:new Date().toLocaleTimeString(),event:EVENT_NAME,
+      method:quickMode?"Quick Complete":"Manual"}};
 
-function bestMatchTime(nxM, tbaM) {
-  if (nxM?.times?.estimatedStartTime) return nxM.times.estimatedStartTime;
-  const t = getTS(tbaM);
-  return t ? t * 1000 : null;
-}
-
-function bestQueueTime(trigNx, ourMs) {
-  if (trigNx?.times?.estimatedStartTime) return trigNx.times.estimatedStartTime;
-  return ourMs ? ourMs - 10 * 60 * 1000 : null;
-}
-
-function getAlliances(nxM, tbaM) {
-  const red = nxM ? (nxM.redTeams || []) : getAl(tbaM, "red");
-  const blue = nxM ? (nxM.blueTeams || []) : getAl(tbaM, "blue");
-  const mc = red.includes(CONFIG.team.number) ? "red" : "blue";
-  return {
-    myColor: mc,
-    partners: (mc === "red" ? red : blue).filter(t => t !== CONFIG.team.number),
-    opponents: mc === "red" ? blue : red,
-  };
-}
-
-function nexusSS(status) {
-  if (!status) return null;
-  const s = status.toLowerCase();
-  if (s.includes("queuing")) return { bg: "#fef9c3", text: "#854d0e", label: status };
-  if (s.includes("deck")) return { bg: "#ffedd5", text: "#9a3412", label: status };
-  if (s.includes("field")) return { bg: "#fee2e2", text: "#991b1b", label: status };
-  if (s.includes("complete")) return { bg: "#f1f5f9", text: "#64748b", label: status };
-  return { bg: "#eff6ff", text: "#1d4ed8", label: status };
-}
-
-// ╔══════════════════════════════════════════════════════════════════════════════╗
-// ║  SECTION 9: EMAIL SERVICE                                                    ║
-// ╚══════════════════════════════════════════════════════════════════���═══════════╝
-
-async function sendEmail(mLabel, leadName, div, completed, total, quickMode) {
-  const url = "https://api.emailjs.com/api/v1.0/email/send";
-  const payload = {
-    service_id: CONFIG.email.serviceId,
-    template_id: CONFIG.email.templateId,
-    user_id: CONFIG.email.publicKey,
-    template_params: {
-      to_email: CONFIG.email.notifyEmail,
-      team_number: CONFIG.team.number,
-      match_label: mLabel,
-      lead_name: `${leadName || "Unknown"} (${div})`,
-      completed: String(completed),
-      total: String(total),
-      submitted_time: new Date().toLocaleTimeString(),
-      event: CONFIG.event.name,
-      method: quickMode ? "Quick Complete" : "Manual",
-    },
-  };
-
-  const sendOnce = async (attempt) => {
-    const ctrl = new AbortController();
-    const timeout = setTimeout(() => ctrl.abort(), 10000);
-    try {
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-        signal: ctrl.signal,
-      });
-      if (!res.ok) {
-        const body = await res.text().catch(() => "");
-        console.warn(`[EmailJS] Attempt ${attempt} failed — HTTP ${res.status}: ${body}`);
-      }
-      return res.ok;
-    } catch (err) {
-      console.warn(`[EmailJS] Attempt ${attempt} error:`, err.message);
-      throw err;
-    } finally {
-      clearTimeout(timeout);
-    }
-  };
-
-  try {
-    return await sendOnce(1);
-  } catch {
-    if (!navigator.onLine) return false;
-    await new Promise(r => setTimeout(r, 1200));
-    try { return await sendOnce(2); } catch { return false; }
-  }
-}
-
-// ╔══════════════════════════════════════════════════════════════════════════════╗
-// ║  SECTION 10: DEMO MODE DATA                                                  ║
-// ╚═══════════════════════════════════════════════════════════════════════���══════╝
-
-// Demo mode: realistic comp simulation with configurable speed
-// _demoAnchor stores the real-world timestamp when demo was started/reset
-// _demoSpeed controls how fast time flows (1 = real-time, 4 = 4x speed, etc.)
-let _demoAnchor = null;
-let _demoSpeed = 4; // default 4x speed so a full comp runs in ~30 min
-
-function getDemoNow() {
-  if (!_demoAnchor) _demoAnchor = Date.now();
-  return _demoAnchor + (Date.now() - _demoAnchor) * _demoSpeed;
-}
-
-function resetDemoAnchor() { _demoAnchor = Date.now(); }
-function setDemoSpeed(s) { _demoSpeed = Math.max(1, Math.min(20, s)); }
-function getDemoSpeed() { return _demoSpeed; }
-
-function buildMockNexus() {
-  const now = getDemoNow(), min = 60000;
-  // Team 115 appears in quals 1, 4, 7, 10, 13, 16, and playoffs
-  const TM = new Set([1, 4, 7, 10, 13, 16]);
-  // Pool of realistic FRC team numbers for alliance partners/opponents
-  const POOL_A = ["254", "1678", "2910", "3538", "4255", "6036", "971", "1323"];
-  const POOL_B = ["330", "2984", "5507", "6418", "3255", "4150", "118", "148"];
-
-  // Build 18 qual matches — every ~7 min apart, with queuing 14 min before
-  const qualCount = 18;
-  const matchGap = 7 * min; // 7 min between matches
-  const firstMatchStart = _demoAnchor + 5 * min; // first match 5 min after demo starts
-
-  const quals = Array.from({ length: qualCount }, (_, i) => {
-    const q = i + 1;
-    const startMs = firstMatchStart + i * matchGap;
-    const has115 = TM.has(q);
-
-    // Build realistic alliances — shuffle partners each time
-    const redTeams = has115
-      ? ["115", POOL_A[i % POOL_A.length], POOL_A[(i + 3) % POOL_A.length]]
-      : [POOL_A[i % POOL_A.length], POOL_B[i % POOL_B.length], POOL_A[(i + 2) % POOL_A.length]];
-    const blueTeams = has115
-      ? [POOL_B[i % POOL_B.length], POOL_B[(i + 2) % POOL_B.length], POOL_B[(i + 4) % POOL_B.length]]
-      : [POOL_B[(i + 1) % POOL_B.length], POOL_A[(i + 4) % POOL_A.length], POOL_B[(i + 3) % POOL_B.length]];
-
-    // Alternate which side 115 is on
-    const finalRed = has115 && q % 2 === 0 ? blueTeams : redTeams;
-    const finalBlue = has115 && q % 2 === 0 ? redTeams : blueTeams;
-
-    const qAt = startMs - 14 * min;
-    const odAt = startMs - 6 * min;
-    const ofAt = startMs - 2 * min;
-
-    let st = "Scheduled";
-    if (now > startMs + 3 * min) st = "Complete";
-    else if (now >= ofAt) st = "On Field";
-    else if (now >= odAt) st = "On Deck";
-    else if (now >= qAt) st = "Now Queuing";
-
-    return {
-      label: `Qualification ${q}`, status: st,
-      redTeams: finalRed, blueTeams: finalBlue,
-      times: { estimatedQueueTime: qAt, estimatedOnDeckTime: odAt, estimatedOnFieldTime: ofAt, estimatedStartTime: startMs },
-    };
-  });
-
-  // Add playoff matches after quals (115 always in playoffs)
-  const playoffStart = firstMatchStart + qualCount * matchGap + 10 * min;
-  const playoffMatches = [
-    { label: "Playoff 1", red: ["115", "254", "1678", "971"], blue: ["330", "2910", "5507", "118"] },
-    { label: "Playoff 2", red: ["330", "2910", "5507", "118"], blue: ["115", "254", "1678", "971"] },
-    { label: "Final 1", red: ["115", "254", "1678", "971"], blue: ["330", "2910", "5507", "118"] },
-  ].map((pm, pi) => {
-    const startMs = playoffStart + pi * matchGap;
-    const qAt = startMs - 14 * min, odAt = startMs - 6 * min, ofAt = startMs - 2 * min;
-    let st = "Scheduled";
-    if (now > startMs + 3 * min) st = "Complete";
-    else if (now >= ofAt) st = "On Field";
-    else if (now >= odAt) st = "On Deck";
-    else if (now >= qAt) st = "Now Queuing";
-    return { label: pm.label, status: st, redTeams: pm.red, blueTeams: pm.blue, times: { estimatedQueueTime: qAt, estimatedOnDeckTime: odAt, estimatedOnFieldTime: ofAt, estimatedStartTime: startMs } };
-  });
-
-  const allMatches = [...quals, ...playoffMatches];
-  const qm = allMatches.find(m => m.status === "Now Queuing");
-
-  // Generate mock announcements based on sim progress
-  const demoAnnouncements = [];
-  const completedCount = allMatches.filter(m => m.status === "Complete").length;
-  if (completedCount >= 6 && completedCount < qualCount) {
-    demoAnnouncements.push({ id: "demo_ann_1", text: `${completedCount} matches complete \u2014 keep those checklists moving!`, urgency: "info", time: now - 2 * min });
-  }
-  if (completedCount >= qualCount) {
-    demoAnnouncements.push({ id: "demo_ann_2", text: "Quals complete \u2014 playoff matches starting soon!", urgency: "urgent", time: now - 1 * min });
-  }
-
-  return {
-    eventKey: "demo", dataAsOfTime: now, nowQueuing: qm?.label || null,
-    matches: allMatches, announcements: demoAnnouncements, partsRequests: [],
-  };
-}
-
-// Demo speed control component shown in demo mode
-function DemoSpeedControl() {
-  const [speed, setSpeed] = useState(getDemoSpeed());
-  const speeds = [1, 2, 4, 8, 12];
-  return (
-    <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
-      <span style={{ fontSize: 9, color: "rgba(255,255,255,.5)", fontWeight: 600 }}>SIM</span>
-      {speeds.map(s => (
-        <button key={s} onClick={() => { setDemoSpeed(s); setSpeed(s); }}
-          style={{ padding: "2px 6px", borderRadius: 5, border: `1px solid ${speed === s ? "#a78bfa" : "rgba(255,255,255,.15)"}`, background: speed === s ? "rgba(167,139,250,.3)" : "transparent", color: speed === s ? "#c4b5fd" : "rgba(255,255,255,.4)", fontSize: 9, fontWeight: 700, cursor: "pointer" }}>
-          {s}x
-        </button>
-      ))}
-      <button onClick={() => { resetDemoAnchor(); }} title="Reset simulation to beginning"
-        style={{ padding: "2px 6px", borderRadius: 5, border: "1px solid rgba(248,113,113,.3)", background: "rgba(248,113,113,.1)", color: "#fca5a5", fontSize: 9, fontWeight: 700, cursor: "pointer", marginLeft: 2 }}>
-        Reset
-      </button>
-    </div>
-  );
-}
-
-// ╔══════════════════════════════════════════════════════════════════════════════╗
-// ║  SECTION 11: SHARED UI COMPONENTS                                            ║
-// ╚══════════════════════════════════════════════════════════════════���═══════════╝
-
-function Badge({ p }) {
-  const c = PC[p] || PC.SECONDARY;
-  return (
-    <span style={{ fontSize: 9, fontWeight: 700, padding: "2px 5px", borderRadius: 4, background: c.bg, color: c.text, whiteSpace: "nowrap", flexShrink: 0 }}>
-      {c.label}
-    </span>
-  );
-}
-
-function GlassCard({ children, style = {} }) {
-  return <div style={{ background: T.card, border: `1px solid ${T.bord}`, borderRadius: 14, ...style }}>{children}</div>;
-}
-
-function SyncStatus() {
-  const [status, setStatus] = useState("checking");
-
-  useEffect(() => {
-    const check = async () => {
-      try {
-        const r = await fetch(`${CONFIG.upstash.url}/ping`, {
-          headers: { Authorization: `Bearer ${CONFIG.upstash.token}` },
+  const sendOnce=async(attempt)=>{
+    const ctrl=new AbortController();
+    const t=setTimeout(()=>ctrl.abort(),10000);
+    try{
+      const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload),signal:ctrl.signal});
+      if(!r.ok){
+        const msg=await r.text().catch(()=>"");
+        console.warn("EmailJS non-OK response",{
+          attempt,status:r.status,body:msg,online:navigator.onLine,origin:window.location.origin,mLabel,div
         });
         const j = await r.json();
         setStatus(j.result === "PONG" ? "synced" : "error");
@@ -1131,80 +810,43 @@ function MatchIntelPanel({ autoMatch, nexusData, tbaMatches }) {
           </div>
         )}
       </div>
-    </div>
-  );
-}
+    </div>);}
 
-// ╔══════════════════════════════════════════════════════════════════════════════╗
-// ║  SECTION 14: CHECKLIST TAB (LEAD VIEW)                                       ║
-// ╚══════════════════════════════════════════════════════════════════════════════╝
+function ChecklistTab({div,nexusData,tbaMatches,autoMatch,demoMode}){
+  const {hidden}=useHiddenItems();
+  const sections=filterSections(div,hidden);
+  const allItems=getAllItems(div,hidden);
+  const allIds=allItems.map(i=>i.id);
+  const critItems=getCritItems(div,hidden);
+  const divCfg=DIVS[div];
 
-function ChecklistTab({ div, nexusData, tbaMatches, autoMatch, demoMode }) {
-  const sections = useDivisionSections(div);
-  const allItems = useMemo(() => getAllItemsFromSections(sections), [sections]);
-  const allIds = useMemo(() => allItems.map(i => i.id), [allItems]);
-  const critItems = useMemo(() => getCritItemsFromSections(sections), [sections]);
-  const divCfg = DIVS[div];
+  const [checked,setChecked]=useState({});
+  const [lead,setLead]=useState("");
+  const [submitting,setSubmit]=useState(false);
+  const [msg,setMsg]=useState("");
+  const [showMarkAll,setMarkAll]=useState(false);
+  const syncRef=useRef(null);
 
-  const [checked, setChecked] = useState({});
-  const [lead, setLead] = useState("");
-  const [submitting, setSubmit] = useState(false);
-  const [msg, setMsg] = useState("");
-  const [showMarkAll, setMarkAll] = useState(false);
-  const syncRef = useRef(null);
+  const matchNum=autoMatch?matchLabelFromParsed(autoMatch):"";
+  const total=allItems.length,done=Object.values(checked).filter(Boolean).length;
+  const pct=Math.round(done/total*100);
+  const critDone=critItems.filter(i=>checked[i.id]).length,allCrit=critDone===critItems.length;
 
-  const matchNum = autoMatch ? matchLabelFromParsed(autoMatch) : "";
-  const total = allItems.length;
-  const done = Object.values(checked).filter(Boolean).length;
-  const pct = total > 0 ? Math.round(done / total * 100) : 0;
-  const critDone = critItems.filter(i => checked[i.id]).length;
-  const allCrit = critItems.length === 0 || critDone === critItems.length;
+  const sKey=useCallback(()=>matchNum?`${divCfg.storKey}:${matchNum}`:divCfg.storKey,[divCfg.storKey,matchNum]);
+  const loadState=useCallback(async()=>{const d=await ls(sKey());if(d?.checked)setChecked(d.checked);},[sKey]);
+  useEffect(()=>{loadState();},[loadState]);
+  useEffect(()=>{syncRef.current=setInterval(loadState,3000);return()=>clearInterval(syncRef.current);},[loadState]);
 
-  const sKey = useCallback(() => matchNum ? `${divCfg.storKey}:${matchNum}` : divCfg.storKey, [divCfg.storKey, matchNum]);
+  const toggle=useCallback(async id=>{
+    setChecked(prev=>{const next={...prev,[id]:!prev[id]};ss(sKey(),{checked:next,updatedBy:lead||"unknown",division:div,updatedAt:Date.now()});return next;});
+  },[sKey,lead,div]);
 
-  const loadState = useCallback(async () => {
-    const d = await ls(sKey());
-    if (d?.checked) setChecked(d.checked);
-  }, [sKey]);
-
-  useEffect(() => { loadState(); }, [loadState]);
-  useEffect(() => {
-    syncRef.current = setInterval(loadState, 3000);
-    return () => clearInterval(syncRef.current);
-  }, [loadState]);
-
-  const toggle = useCallback(async (id) => {
-    setChecked(prev => {
-      const next = { ...prev, [id]: !prev[id] };
-      ss(sKey(), { checked: next, updatedBy: lead || "unknown", division: div, updatedAt: Date.now() });
-      return next;
-    });
-  }, [sKey, lead, div]);
-
-  const doMarkAll = async () => {
-    const all = allIds.reduce((a, id) => ({ ...a, [id]: true }), {});
-    setChecked(all);
-    await ss(sKey(), { checked: all, updatedBy: lead || "unknown", division: div, updatedAt: Date.now() });
-    setMarkAll(false);
-  };
-
-  const markSection = useCallback(async (ids) => {
-    setChecked(prev => {
-      const next = { ...prev };
-      ids.forEach(id => { next[id] = true; });
-      ss(sKey(), { checked: next, updatedBy: lead || "unknown", division: div, updatedAt: Date.now() });
-      return next;
-    });
-  }, [sKey, lead, div]);
-
-  const doReset = async () => {
-    setChecked({});
-    setMsg("");
-    await ss(sKey(), { checked: {}, updatedBy: lead || "unknown", division: div, updatedAt: Date.now() });
-  };
-
-  const doSubmit = async (quickMode = false) => {
-    if (!allCrit) { setMsg("Complete all critical items first."); return; }
+  const doMarkAll=async()=>{
+    const all=allIds.reduce((a,id)=>({...a,[id]:true}),{});
+    setChecked(all);await ss(sKey(),{checked:all,updatedBy:lead||"unknown",division:div,updatedAt:Date.now()});setMarkAll(false);};
+  const doReset=async()=>{setChecked({});setMsg("");await ss(sKey(),{checked:{},updatedBy:lead||"unknown",division:div,updatedAt:Date.now()});};
+  const doSubmit=async(quickMode=false)=>{
+    if(!allCrit){setMsg("⚠️ Complete all critical items first.");return;}
     setSubmit(true);
     const archKey = demoMode ? SK.archDemo : divCfg.archKey;
     const entry = {
@@ -1305,55 +947,41 @@ function ChecklistTab({ div, nexusData, tbaMatches, autoMatch, demoMode }) {
           {submitting ? "Submitting..." : allCrit ? "Submit & Notify Director" : "Complete all critical items to submit"}
         </button>
       </div>
-    </div>
-  );
-}
+    </div>);}
 
 
-// ╔══════════════════════════════════════════════════════════════════════════════╗
-// ║  SECTION 15: SCHEDULE TAB                                                    ║
-// ╚══════════════════════════════════════════════════════════════════════════════╝
+// ── SCHEDULE TAB ──────────────────────────────────────────────────────────────
+function ScheduleTab({nexusData,tbaMatches,onFetch,loading,error}){
+  const now=useNow();
+  const alerted=useRef(new Set());
+  const t115nx=(nexusData?.matches||[]).filter(m=>[...(m.redTeams||[]),...(m.blueTeams||[])].includes(TEAM_NUM));
+  const t115tba=tbaMatches.filter(m=>[...(m.alliances?.red?.team_keys||[]),...(m.alliances?.blue?.team_keys||[])].includes(TEAM_KEY));
+  const nextNx=t115nx.find(m=>{const ts=m.times?.estimatedStartTime;return ts&&ts>now-300000;});
+  const nextTba=t115tba.find(m=>{const ts=getTS(m);return ts&&ts*1000>now-300000;});
+  useEffect(()=>{t115nx.forEach(m=>{const qi=m.times?.estimatedQueueTime;if(!qi)return;const diff=qi-now;
+    if(diff>0&&diff<30000&&!alerted.current.has(m.label)){alerted.current.add(m.label);
+      if(Notification.permission==="granted"){
+        if("serviceWorker" in navigator&&navigator.serviceWorker.ready){
+          navigator.serviceWorker.ready.then(reg=>reg.showNotification(`🤖 Team 115 — Queue for ${m.label}!`)).catch(()=>{});
+        }
+      }}});},[now,t115nx]);
 
-function ScheduleTab({ nexusData, tbaMatches, onFetch, loading, error }) {
-  const now = useNow();
-  const alerted = useRef(new Set());
-  const t115nx = (nexusData?.matches || []).filter(m => [...(m.redTeams || []), ...(m.blueTeams || [])].includes(CONFIG.team.number));
-  const t115tba = tbaMatches.filter(m => [...(m.alliances?.red?.team_keys || []), ...(m.alliances?.blue?.team_keys || [])].includes(CONFIG.team.key));
-  const nextNx = t115nx.find(m => { const ts = m.times?.estimatedStartTime; return ts && ts > now - 300000; });
-  const nextTba = t115tba.find(m => { const ts = getTS(m); return ts && ts * 1000 > now - 300000; });
-
-  useEffect(() => {
-    t115nx.forEach(m => {
-      const qi = m.times?.estimatedQueueTime;
-      if (!qi) return;
-      const diff = qi - now;
-      if (diff > 0 && diff < 30000 && !alerted.current.has(m.label)) {
-        alerted.current.add(m.label);
-        if (Notification.permission === "granted") new Notification(`Team 115 \u2014 Queue for ${m.label}!`);
-      }
-    });
-  }, [now, t115nx]);
-
-  const renderHero = (nxM, tbaM) => {
-    if (!nxM && !tbaM) return (
-      <div style={{ background: T.card, borderRadius: 12, padding: 16, color: T.textD, textAlign: "center", fontSize: 13, marginBottom: 14, border: `1px solid ${T.bord}` }}>
-        {tbaMatches.length === 0 ? "No schedule loaded \u2014 tap Fetch below" : "No upcoming matches found"}
-      </div>
-    );
-    const ts = bestMatchTime(nxM, tbaM);
-    const trig = nxM ? findQueueTrigger(nexusData?.matches || [], nxM) : null;
-    const qMs = bestQueueTime(trig, ts);
-    const diffMs = qMs ? qMs - now : null;
-    const passed = diffMs !== null && diffMs < 0;
-    const urgent = diffMs !== null && diffMs >= 0 && diffMs < 90000;
-    const al = getAlliances(nxM, tbaM);
-    const nxStatus = nxM ? nexusSS(nxM.status) : null;
-    const lbl = nxM?.label || mLbl(tbaM);
-
-    return (
-      <div style={{ borderRadius: 12, background: passed || urgent ? "#fef2f2" : T.card, color: passed || urgent ? "#1e293b" : T.text, padding: 16, marginBottom: 14, border: passed || urgent ? "2px solid #dc2626" : `1px solid ${T.bord}`, boxShadow: T.glow }}>
-        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, marginBottom: 4, color: passed || urgent ? "#dc2626" : T.textD }}>
-          {passed ? "QUEUE NOW" : urgent ? "QUEUE VERY SOON" : "NEXT MATCH \u2014 TEAM 115"}
+  const renderHero=(nxM,tbaM)=>{
+    if(!nxM&&!tbaM)return(
+      <div style={{background:T.card,borderRadius:12,padding:16,color:T.textD,textAlign:"center",fontSize:13,marginBottom:14,border:`1px solid ${T.bord}`}}>
+        {tbaMatches.length===0?"No schedule loaded — tap Fetch below":"No upcoming matches found"}
+      </div>);
+    const ts=bestMatchTime(nxM,tbaM);
+    const trig=nxM?findQueueTrigger(nexusData?.matches||[],nxM):null;
+    const qMs=bestQueueTime(trig,ts);const diffMs=qMs?qMs-now:null;
+    const passed=diffMs!==null&&diffMs<0,urgent=diffMs!==null&&diffMs>=0&&diffMs<90000;
+    const al=getAlliances(nxM,tbaM);const ss2=nxM?nexusSS(nxM.status):null;
+    const lbl=nxM?.label||mLbl(tbaM);
+    return(
+      <div style={{borderRadius:12,background:passed||urgent?"#fef2f2":T.card,color:passed||urgent?"#1e293b":T.text,
+        padding:16,marginBottom:14,border:passed||urgent?"2px solid #dc2626":`1px solid ${T.bord}`,boxShadow:T.glow}}>
+        <div style={{fontSize:11,fontWeight:700,letterSpacing:1,marginBottom:4,color:passed||urgent?"#dc2626":T.textD}}>
+          {passed?"🚨 QUEUE NOW":urgent?"⚠️ QUEUE VERY SOON":"⏭ NEXT MATCH — TEAM 115"}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
           <span style={{ fontSize: 26, fontWeight: 800, color: passed ? "#dc2626" : undefined }}>{lbl}</span>
@@ -1381,47 +1009,31 @@ function ScheduleTab({ nexusData, tbaMatches, onFetch, loading, error }) {
     );
   };
 
-  return (
-    <div style={{ padding: 14 }}>
-      {renderHero(nextNx, nextTba)}
-      <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
-        <button onClick={onFetch} disabled={loading} style={{ flex: 1, background: T.pur, color: "white", border: "none", borderRadius: 8, padding: "10px", fontWeight: 700, fontSize: 13, cursor: "pointer", opacity: loading ? .7 : 1 }}>
-          {loading ? "Loading..." : "Fetch Schedule"}
-        </button>
-        <button onClick={() => { "Notification" in window && Notification.requestPermission(); }} style={{ background: T.card2, border: `1px solid ${T.bord}`, borderRadius: 8, padding: "10px 12px", fontWeight: 600, fontSize: 12, cursor: "pointer", color: T.textM }}>{"\u{1F514}"}</button>
-      </div>
-      {error && <div style={{ background: "#fee2e2", border: "1px solid #fca5a5", borderRadius: 8, padding: "10px 12px", fontSize: 12, color: "#991b1b", marginBottom: 12 }}>{error}</div>}
-      {(t115nx.length > 0 || t115tba.length > 0) && <div>
-        <div style={{ fontSize: 12, fontWeight: 700, color: T.textD, marginBottom: 8, textTransform: "uppercase", letterSpacing: .5 }}>Team 115 &mdash; {CONFIG.event.key}</div>
-        {(t115nx.length ? t115nx : t115tba).map((m, idx) => {
-          const isNx = !!m.label;
-          const ts = isNx ? bestMatchTime(m, null) : (getTS(m) || 0) * 1000;
-          const matchPassed = ts && ts < now - 120000;
-          const al = getAlliances(isNx ? m : null, isNx ? null : m);
-          const trig = isNx ? findQueueTrigger(nexusData?.matches || [], m) : null;
-          const qMs = bestQueueTime(trig, ts);
-          const diffMs = qMs ? qMs - now : null;
-          const soon = diffMs !== null && diffMs >= 0 && diffMs < 90000;
-          const nxStatus = isNx ? nexusSS(m.status) : null;
-          const matchLabel = isNx ? m.label : mLbl(m);
-          return (
-            <div key={idx} style={{ borderRadius: 8, border: `1px solid ${soon ? "#fca5a5" : T.bord}`, background: soon ? "#fef2f2" : matchPassed ? "rgba(255,255,255,.02)" : "rgba(255,255,255,.04)", marginBottom: 8 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px" }}>
-                <div style={{ width: 3, height: 40, borderRadius: 2, background: al?.myColor === "red" ? "#dc2626" : "#2563eb", flexShrink: 0 }} />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                    <span style={{ fontWeight: 700, fontSize: 14, color: matchPassed ? T.textD : T.text }}>{matchLabel}</span>
-                    {nxStatus && <span style={{ fontSize: 9, fontWeight: 700, padding: "1px 5px", borderRadius: 99, background: nxStatus.bg, color: nxStatus.text }}>{nxStatus.label}</span>}
-                    {soon && <span style={{ fontSize: 10, fontWeight: 700, background: "#fee2e2", color: "#dc2626", padding: "1px 6px", borderRadius: 4 }}>QUEUE NOW</span>}
-                    {matchPassed && <span style={{ fontSize: 10, color: T.textD }}>{"\u2713"} passed</span>}
-                  </div>
-                  <div style={{ fontSize: 11, color: T.textD }}>{ts ? `${fmtDate(ts)} \u00B7 ${fmtTime(ts)}` : ""}</div>
-                  {!matchPassed && qMs && <div style={{ fontSize: 10, color: soon ? "#dc2626" : T.textD, marginTop: 1 }}>{trig ? `Queue at start of ${trig.label}` : `Queue at ${fmtTime(qMs)}`}</div>}
-                </div>
-                <div style={{ textAlign: "right", flexShrink: 0 }}>
-                  {al && <div style={{ fontSize: 11, color: T.textD }}>w/ #{al.partners.join(", #")}</div>}
-                  {!matchPassed && diffMs !== null && <div style={{ fontFamily: "monospace", fontSize: 11, fontWeight: 700, marginTop: 2, color: soon ? "#dc2626" : T.textM }}>{diffMs >= 0 ? fmtCD(diffMs) : "Queue!"}</div>}
-                </div>
+  return(<div style={{padding:14}}>
+    {renderHero(nextNx,nextTba)}
+    <div style={{display:"flex",gap:8,marginBottom:14}}>
+      <button onClick={onFetch} disabled={loading} style={{flex:1,background:T.pur,color:"white",border:"none",borderRadius:8,padding:"10px",fontWeight:700,fontSize:13,cursor:"pointer",opacity:loading?.7:1}}>{loading?"Loading…":"🔄 Fetch Schedule"}</button>
+      <button onClick={async()=>{if("Notification" in window){await Notification.requestPermission();if("serviceWorker" in navigator)navigator.serviceWorker.register("/sw.js").catch(()=>{});}}} style={{background:T.card2,border:`1px solid ${T.bord}`,borderRadius:8,padding:"10px 12px",fontWeight:600,fontSize:12,cursor:"pointer",color:T.textM}}>🔔</button>
+    </div>
+    {error&&<div style={{background:"#fee2e2",border:"1px solid #fca5a5",borderRadius:8,padding:"10px 12px",fontSize:12,color:"#991b1b",marginBottom:12}}>{error}</div>}
+    {(t115nx.length||t115tba.length)>0&&<div>
+      <div style={{fontSize:12,fontWeight:700,color:T.textD,marginBottom:8,textTransform:"uppercase",letterSpacing:.5}}>Team 115 — {EVENT_KEY}</div>
+      {(t115nx.length?t115nx:t115tba).map((m,idx)=>{
+        const isNx=!!m.label;const ts=isNx?bestMatchTime(m,null):(getTS(m)||0)*1000;
+        const passed=ts&&ts<now-120000;const al=getAlliances(isNx?m:null,isNx?null:m);
+        const trig=isNx?findQueueTrigger(nexusData?.matches||[],m):null;
+        const qMs=bestQueueTime(trig,ts);const diffMs=qMs?qMs-now:null;
+        const soon=diffMs!==null&&diffMs>=0&&diffMs<90000;
+        const ss2=isNx?nexusSS(m.status):null;const label=isNx?m.label:mLbl(m);
+        return(<div key={idx} style={{borderRadius:8,border:`1px solid ${soon?"#fca5a5":T.bord}`,background:soon?"#fef2f2":passed?"rgba(255,255,255,.02)":"rgba(255,255,255,.04)",marginBottom:8}}>
+          <div style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px"}}>
+            <div style={{width:3,height:40,borderRadius:2,background:al?.myColor==="red"?"#dc2626":"#2563eb",flexShrink:0}}/>
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}>
+                <span style={{fontWeight:700,fontSize:14,color:passed?T.textD:T.text}}>{label}</span>
+                {ss2&&<span style={{fontSize:9,fontWeight:700,padding:"1px 5px",borderRadius:99,background:ss2.bg,color:ss2.text}}>{ss2.label}</span>}
+                {soon&&<span style={{fontSize:10,fontWeight:700,background:"#fee2e2",color:"#dc2626",padding:"1px 6px",borderRadius:4}}>QUEUE NOW</span>}
+                {passed&&<span style={{fontSize:10,color:T.textD}}>✓ passed</span>}
               </div>
             </div>
           );
@@ -1906,185 +1518,62 @@ function DirectorIssues() {
               <button onClick={() => remove(iss.id)} style={{ background: "none", border: "none", cursor: "pointer", color: T.red, fontSize: 16, flexShrink: 0 }}>{"\u2715"}</button>
             </div>
           </div>
-        );
-      })}
-    </div>
-  );
-}
+        </div>);})}
+    </div>);}
 
-// ╔══════════════════════════════════════════════════════════════════════════════╗
-// ║  SECTION 20: DIRECTOR CHECKLIST MANAGEMENT                                   ║
-// ╚══════════════════════════════════════════════════════════════════════════════╝
-
-function DirectorChecklistManager() {
-  const [items, setItems] = useState([]);
-  const [div, setDiv] = useState("elec");
-  const [text, setText] = useState("");
-  const [note, setNote] = useState("");
-  const [priority, setPriority] = useState("HIGH");
-  const [msg, setMsg] = useState("");
-
-  useEffect(() => {
-    ls(SK.dirItems).then(d => setItems(asArray(d)));
-    const t = setInterval(() => ls(SK.dirItems).then(d => setItems(asArray(d))), 10000);
-    return () => clearInterval(t);
-  }, []);
-
-  const addItem = async () => {
-    if (!text.trim()) return;
-    const newItem = {
-      id: `dir_${Date.now()}`,
-      division: div,
-      text: text.trim(),
-      note: note.trim() || null,
-      priority,
-      addedAt: Date.now(),
-    };
-    const updated = [...items, newItem];
-    setItems(updated);
-    await ss(SK.dirItems, updated);
-    setText("");
-    setNote("");
-    setMsg(`Added to ${DIVS[div].label} checklist`);
-    setTimeout(() => setMsg(""), 2000);
-  };
-
-  const removeItem = async (id) => {
-    const updated = items.filter(i => i.id !== id);
-    setItems(updated);
-    await ss(SK.dirItems, updated);
-    setMsg("Item removed from all devices");
-    setTimeout(() => setMsg(""), 2000);
-  };
-
-  const clearAll = async () => {
-    setItems([]);
-    await ss(SK.dirItems, []);
-    setMsg("All custom items cleared");
-    setTimeout(() => setMsg(""), 2000);
-  };
-
-  const iS = { width: "100%", background: "rgba(255,255,255,.05)", border: `1px solid ${T.bord}`, borderRadius: 7, padding: "7px 9px", fontSize: 13, color: T.text, outline: "none", boxSizing: "border-box" };
-
-  return (
-    <div style={{ padding: 14, paddingBottom: 32 }}>
-      <div style={{ background: T.card, border: `1px solid ${T.bord}`, borderRadius: 12, padding: 14, marginBottom: 14 }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: T.textD, marginBottom: 10, textTransform: "uppercase", letterSpacing: .5 }}>
-          Add Checklist Item to All Devices
+// ── DIRECTOR: SETTINGS ────────────────────────────────────────────────────────
+function DirectorSettings({onLock,onPinChange}){
+  const [archiveSizes,setArchiveSizes]=useState({elec:0,mech:0,sw:0,demo:0});
+  const [clearMsg,setClearMsg]=useState("");
+  const [newPin,setNewPin]=useState("");const [confirmPin,setConfirmPin]=useState("");const [pinMsg,setPinMsg]=useState("");
+  const [nexusInput,setNexusInput]=useState(HARDCODED_NEXUS_KEY);const [ytInput,setYtInput]=useState(YOUTUBE_STREAM_URL);
+  const {hidden,toggle:toggleHidden}=useHiddenItems();
+  const [editDiv,setEditDiv]=useState(null);
+  useEffect(()=>{
+    Promise.all([ls(SK.archElec),ls(SK.archMech),ls(SK.archSW),ls(SK.archDemo||"frc115_arch_demo_v6")]).then(([e,m,s,d])=>{
+      setArchiveSizes({elec:(e||[]).length,mech:(m||[]).length,sw:(s||[]).length,demo:(d||[]).length});});
+  },[]);
+  const savePin=async()=>{if(newPin.length!==4){setPinMsg("⚠️ PIN must be 4 digits");return;}if(newPin!==confirmPin){setPinMsg("⚠️ PINs don't match");return;}
+    await ss(SK.dirPin,newPin);onPinChange(newPin);setNewPin("");setConfirmPin("");setPinMsg("✅ PIN updated — active now");setTimeout(()=>setPinMsg(""),3000);};
+  const clearArch=async(k,div)=>{await ss(k,[]);setArchiveSizes(s=>({...s,[div]:0}));setClearMsg(`✅ ${div} archive cleared`);setTimeout(()=>setClearMsg(""),2000);};
+  const clearAnn=async()=>{await ss(SK.announce,[]);setClearMsg("✅ Announcements cleared");setTimeout(()=>setClearMsg(""),2000);};
+  const bS={background:T.card,border:`1px solid ${T.bord}`,borderRadius:12,padding:14,marginBottom:10};
+  const lS={fontSize:11,fontWeight:700,color:T.textD,marginBottom:8,textTransform:"uppercase",letterSpacing:.5};
+  const iS={width:"100%",background:"rgba(255,255,255,.05)",border:`1px solid ${T.bord}`,borderRadius:7,padding:"8px 10px",fontSize:13,color:T.text,outline:"none",boxSizing:"border-box",marginBottom:8};
+  const btn=(col=T.pur)=>({width:"100%",background:col,color:"white",border:"none",borderRadius:8,padding:"9px",fontWeight:700,fontSize:13,cursor:"pointer",marginBottom:6});
+  return(
+    <div style={{padding:14,paddingBottom:32}}>
+      {/* Checklist Item Management */}
+      <div style={bS}>
+        <div style={lS}>Manage Checklist Items</div>
+        <div style={{fontSize:11,color:T.textD,marginBottom:10}}>Remove items from checklists. Leads will not see removed items. {hidden.size>0&&<span style={{color:T.amber,fontWeight:700}}>{hidden.size} item{hidden.size!==1?"s":""} hidden</span>}</div>
+        <div style={{display:"flex",gap:6,marginBottom:10}}>
+          {[["elec","⚡","Electrical"],["mech","🔧","Mechanical"],["sw","💻","Software"]].map(([d,emoji,label])=>(
+            <button key={d} onClick={()=>setEditDiv(editDiv===d?null:d)}
+              style={{flex:1,background:editDiv===d?"rgba(147,51,234,.2)":"rgba(255,255,255,.04)",border:`1px solid ${editDiv===d?T.pur:T.bord}`,borderRadius:8,padding:"8px 4px",cursor:"pointer",textAlign:"center"}}>
+              <div style={{fontSize:14}}>{emoji}</div>
+              <div style={{fontSize:9,fontWeight:700,color:editDiv===d?T.purL:T.textD}}>{label}</div>
+            </button>))}
         </div>
-
-        <div style={{ fontSize: 10, color: T.textD, marginBottom: 3 }}>DIVISION</div>
-        <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
-          {Object.values(DIVS).map(d => (
-            <button key={d.id} onClick={() => setDiv(d.id)}
-              style={{ flex: 1, padding: "7px 4px", borderRadius: 8, border: `1px solid ${div === d.id ? d.color : T.bord}`, background: div === d.id ? `${d.color}20` : "transparent", color: div === d.id ? d.color : T.textD, fontSize: 10, fontWeight: 700, cursor: "pointer" }}>
-              {d.emoji} {d.label}
-            </button>
-          ))}
-        </div>
-
-        <div style={{ fontSize: 10, color: T.textD, marginBottom: 3 }}>PRIORITY</div>
-        <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
-          {Object.entries(PC).map(([k, v]) => (
-            <button key={k} onClick={() => setPriority(k)}
-              style={{ flex: 1, padding: "5px 4px", borderRadius: 6, border: `1px solid ${priority === k ? v.dot : T.bord}`, background: priority === k ? v.bg : "transparent", color: priority === k ? v.text : T.textD, fontSize: 9, fontWeight: 700, cursor: "pointer" }}>
-              {v.label}
-            </button>
-          ))}
-        </div>
-
-        <div style={{ fontSize: 10, color: T.textD, marginBottom: 3 }}>ITEM TEXT</div>
-        <input value={text} onChange={e => setText(e.target.value)} placeholder="e.g., Check intake belt tension" style={{ ...iS, marginBottom: 8 }} />
-
-        <div style={{ fontSize: 10, color: T.textD, marginBottom: 3 }}>NOTE (optional)</div>
-        <input value={note} onChange={e => setNote(e.target.value)} placeholder="e.g., Belt slipped in Q3" style={{ ...iS, marginBottom: 10 }} />
-
-        <button onClick={addItem} disabled={!text.trim()}
-          style={{ width: "100%", background: text.trim() ? T.pur : "rgba(126,34,206,.2)", color: text.trim() ? "white" : T.textD, border: "none", borderRadius: 8, padding: "10px", fontWeight: 700, fontSize: 13, cursor: text.trim() ? "pointer" : "default" }}>
-          Add to {DIVS[div].label} Checklist
-        </button>
-        {msg && <div style={{ fontSize: 12, color: T.green, marginTop: 6 }}>{msg}</div>}
+        {editDiv&&(DIVISION_SECTIONS[editDiv]||[]).map(sec=>(
+          <div key={sec.id} style={{marginBottom:8}}>
+            <div style={{fontSize:11,fontWeight:700,color:sec.color,marginBottom:4,padding:"4px 0"}}>{sec.title}</div>
+            {sec.items.map(item=>{
+              const isHidden=hidden.has(item.id);
+              return(
+                <div key={item.id} onClick={()=>toggleHidden(item.id)}
+                  style={{display:"flex",alignItems:"center",gap:8,padding:"6px 8px",borderRadius:6,marginBottom:2,cursor:"pointer",
+                    background:isHidden?"rgba(248,113,113,.1)":"rgba(255,255,255,.03)",border:`1px solid ${isHidden?"rgba(248,113,113,.3)":T.bord}`,opacity:isHidden?.6:1}}>
+                  <span style={{fontSize:12,flexShrink:0}}>{isHidden?"🚫":"✅"}</span>
+                  <div style={{flex:1,fontSize:11,color:isHidden?T.red:T.text,textDecoration:isHidden?"line-through":"none"}}>{item.text}</div>
+                  <span style={{fontSize:9,fontWeight:700,padding:"1px 5px",borderRadius:4,
+                    background:item.priority==="CRITICAL"?"rgba(239,68,68,.15)":item.priority==="HIGH"?"rgba(251,146,60,.15)":"rgba(250,204,21,.15)",
+                    color:item.priority==="CRITICAL"?"#ef4444":item.priority==="HIGH"?"#fb923c":"#fbbf24"}}>{item.priority}</span>
+                </div>);
+            })}
+          </div>))}
       </div>
 
-      {items.length > 0 && (
-        <div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: T.textD, textTransform: "uppercase", letterSpacing: .5 }}>
-              Custom Items ({items.length})
-            </div>
-            <button onClick={clearAll} style={{ fontSize: 11, color: T.red, background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}>Clear All</button>
-          </div>
-          {items.map(item => {
-            const dv = DIVS[item.division] || DIVS.elec;
-            return (
-              <div key={item.id} style={{ background: T.card, border: `1px solid ${T.bord}`, borderRadius: 10, padding: "10px 12px", marginBottom: 8, display: "flex", gap: 10, alignItems: "flex-start" }}>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap", marginBottom: 4 }}>
-                    <span style={{ fontSize: 11, background: `${dv.color}20`, color: dv.color, padding: "1px 7px", borderRadius: 99, fontWeight: 700 }}>{dv.emoji} {dv.label}</span>
-                    <Badge p={item.priority} />
-                  </div>
-                  <div style={{ fontSize: 13, color: T.text, lineHeight: 1.4 }}>{item.text}</div>
-                  {item.note && <div style={{ fontSize: 11, color: T.textD, marginTop: 2 }}>{"\u27A4"} {item.note}</div>}
-                  <div style={{ fontSize: 10, color: T.textD, marginTop: 3 }}>Added {fmtDT(item.addedAt)}</div>
-                </div>
-                <button onClick={() => removeItem(item.id)} style={{ background: "none", border: "none", cursor: "pointer", color: T.red, fontSize: 16, flexShrink: 0 }}>{"\u2715"}</button>
-              </div>
-            );
-          })}
-        </div>
-      )}
-      {items.length === 0 && <div style={{ textAlign: "center", padding: 24, color: T.textD, fontSize: 13 }}>No custom checklist items. Add items above and they'll appear in all lead checklists instantly.</div>}
-    </div>
-  );
-}
-
-// ╔══════════════════════════════════════════════════════════════════════════════╗
-// ║  SECTION 21: DIRECTOR SETTINGS                                               ║
-// ╚══════════════════════════════════════════════════════════════════════════════╝
-
-function DirectorSettings({ onLock, onPinChange }) {
-  const [archiveSizes, setArchiveSizes] = useState({ elec: 0, mech: 0, sw: 0, demo: 0 });
-  const [clearMsg, setClearMsg] = useState("");
-  const [newPin, setNewPin] = useState("");
-  const [confirmPin, setConfirmPin] = useState("");
-  const [pinMsg, setPinMsg] = useState("");
-
-  useEffect(() => {
-    Promise.all([ls(SK.archElec), ls(SK.archMech), ls(SK.archSW), ls(SK.archDemo)]).then(([e, m, s, d]) => {
-      setArchiveSizes({ elec: (e || []).length, mech: (m || []).length, sw: (s || []).length, demo: (d || []).length });
-    });
-  }, []);
-
-  const savePin = async () => {
-    if (newPin.length !== 4) { setPinMsg("PIN must be 4 digits"); return; }
-    if (newPin !== confirmPin) { setPinMsg("PINs don't match"); return; }
-    await ss(SK.dirPin, newPin);
-    onPinChange(newPin);
-    setNewPin(""); setConfirmPin("");
-    setPinMsg("PIN updated \u2014 active now");
-    setTimeout(() => setPinMsg(""), 3000);
-  };
-
-  const clearArch = async (k, div) => {
-    await ss(k, []);
-    setArchiveSizes(s => ({ ...s, [div]: 0 }));
-    setClearMsg(`${div} archive cleared`);
-    setTimeout(() => setClearMsg(""), 2000);
-  };
-
-  const clearAnn = async () => {
-    await ss(SK.announce, []);
-    setClearMsg("Announcements cleared");
-    setTimeout(() => setClearMsg(""), 2000);
-  };
-
-  const bS = { background: T.card, border: `1px solid ${T.bord}`, borderRadius: 12, padding: 14, marginBottom: 10 };
-  const lS = { fontSize: 11, fontWeight: 700, color: T.textD, marginBottom: 8, textTransform: "uppercase", letterSpacing: .5 };
-  const iS = { width: "100%", background: "rgba(255,255,255,.05)", border: `1px solid ${T.bord}`, borderRadius: 7, padding: "8px 10px", fontSize: 13, color: T.text, outline: "none", boxSizing: "border-box", marginBottom: 8 };
-  const btn = (col = T.pur) => ({ width: "100%", background: col, color: "white", border: "none", borderRadius: 8, padding: "9px", fontWeight: 700, fontSize: 13, cursor: "pointer", marginBottom: 6 });
-
-  return (
-    <div style={{ padding: 14, paddingBottom: 32 }}>
       <div style={bS}>
         <div style={lS}>Change Director PIN</div>
         <input value={newPin} onChange={e => setNewPin(e.target.value)} placeholder="New 4-digit PIN" type="password" maxLength={4} style={iS} />
@@ -2121,84 +1610,47 @@ function DirectorSettings({ onLock, onPinChange }) {
       <button onClick={onLock} style={{ width: "100%", background: "rgba(248,113,113,.1)", border: "1px solid rgba(248,113,113,.3)", borderRadius: 8, padding: "10px", fontWeight: 700, fontSize: 13, cursor: "pointer", color: T.red }}>
         Lock Director Mode
       </button>
-    </div>
-  );
-}
+    </div>);}
 
-// ╔══════════════════════════════════════════════════════════════════════════════╗
-// ║  SECTION 22: LEAD APP                                                        ║
-// ╚══════════════════════════════════════════════════════════════════════════════╝
 
-function LeadApp({ div, onBack, demoMode, onToggleDemo }) {
-  const [tab, setTab] = useState("checklist");
-  const [nexusData, setNexusData] = useState(null);
-  const [tbaMatches, setTBA] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [nexusKey, setNexusKey] = useState(CONFIG.apis.nexusKey);
-  const [showNKModal, setShowNK] = useState(false);
-  const [nexusKeyInput, setNKI] = useState(CONFIG.apis.nexusKey);
-  const divCfg = DIVS[div];
+// ── LEAD APP ──────────────────────────────────────────────────────────────────
+function LeadApp({div,onBack,demoMode,onToggleDemo}){
+  const [tab,setTab]=useState("checklist");
+  const [nexusData,setNexusData]=useState(null);
+  const [tbaMatches,setTBA]=useState([]);
+  const [tbaAllMatches,setTBAAll]=useState([]);
+  const [loading,setLoading]=useState(false);
+  const [error,setError]=useState("");
+  const [nexusKey,setNexusKey]=useState(HARDCODED_NEXUS_KEY);
+  const [showNKModal,setShowNK]=useState(false);const [nexusKeyInput,setNKI]=useState(HARDCODED_NEXUS_KEY);
+  const divCfg=DIVS[div];
 
-  useEffect(() => { ls(SK.nexus).then(k => { if (k) setNexusKey(k); }); }, []);
-  useEffect(() => {
-    if (!demoMode) return;
-    setNexusData(buildMockNexus());
-    const t = setInterval(() => setNexusData(buildMockNexus()), 5000);
-    return () => clearInterval(t);
-  }, [demoMode]);
+  useEffect(()=>{ls(SK.nexus).then(k=>{if(k)setNexusKey(k);});},[]);
+  useEffect(()=>{if(!demoMode)return;setNexusData(buildMockNexus());const t=setInterval(()=>setNexusData(buildMockNexus()),5000);return()=>clearInterval(t);},[demoMode]);
 
-  const fetchAll = useCallback(async () => {
-    setLoading(true);
-    setError("");
-    const errs = [];
-    const tk = demoMode ? CONFIG.demo.tbaTeam : CONFIG.team.key;
-    const ek = demoMode ? CONFIG.demo.tbaEvent : CONFIG.event.key;
+  const fetchAll=useCallback(async()=>{
+    setLoading(true);setError("");const errs=[];
+    const tk=demoMode?DEMO_TBA_TEAM:TEAM_KEY,ek=demoMode?DEMO_TBA_EVENT:EVENT_KEY;
+    try{const r=await fetch(`https://www.thebluealliance.com/api/v3/team/${tk}/event/${ek}/matches`,{headers:{"X-TBA-Auth-Key":TBA_KEY}});if(r.ok)setTBA(await r.json());else errs.push(`TBA ${r.status}`);}catch{errs.push("TBA failed");}
+    try{const r=await fetch(`https://www.thebluealliance.com/api/v3/event/${ek}/matches`,{headers:{"X-TBA-Auth-Key":TBA_KEY}});if(r.ok)setTBAAll(await r.json());}catch{}
+    if(!demoMode&&nexusKey){try{const r=await fetch(`https://frc.nexus/api/v1/event/${NEXUS_EVENT}`,{headers:{"Nexus-Api-Key":nexusKey}});if(r.ok)setNexusData(await r.json());else errs.push(`Nexus ${r.status}`);}catch{errs.push("Nexus failed");}}
+    if(errs.length)setError(errs.join(" · "));setLoading(false);
+  },[nexusKey,demoMode]);
 
-    try {
-      const r = await fetch(`https://www.thebluealliance.com/api/v3/team/${tk}/event/${ek}/matches`, { headers: { "X-TBA-Auth-Key": CONFIG.apis.tbaKey } });
-      if (r.ok) setTBA(await r.json()); else errs.push(`TBA ${r.status}`);
-    } catch { errs.push("TBA failed"); }
+  // Auto-fetch schedule on mount
+  const hasFetched=useRef(false);
+  useEffect(()=>{if(!hasFetched.current){hasFetched.current=true;fetchAll();}},[fetchAll]);
 
-    if (!demoMode && nexusKey) {
-      try {
-        const r = await fetch(`https://frc.nexus/api/v1/event/${CONFIG.apis.nexusEvent}`, { headers: { "Nexus-Api-Key": nexusKey } });
-        if (r.ok) setNexusData(await r.json()); else errs.push(`Nexus ${r.status}`);
-      } catch { errs.push("Nexus failed"); }
-    }
+  useEffect(()=>{if(tbaMatches.length===0)return;const t=setInterval(()=>{const tk=demoMode?DEMO_TBA_TEAM:TEAM_KEY,ek=demoMode?DEMO_TBA_EVENT:EVENT_KEY;fetch(`https://www.thebluealliance.com/api/v3/team/${tk}/event/${ek}/matches`,{headers:{"X-TBA-Auth-Key":TBA_KEY}}).then(r=>r.ok?r.json():null).then(d=>{if(d)setTBA(d);});}
+  ,5*60*1000);return()=>clearInterval(t);},[tbaMatches.length,demoMode]);
 
-    if (errs.length) setError(errs.join(" \u00B7 "));
-    setLoading(false);
-  }, [nexusKey, demoMode]);
-
-  useEffect(() => {
-    if (tbaMatches.length === 0) return;
-    const t = setInterval(() => {
-      const tk = demoMode ? CONFIG.demo.tbaTeam : CONFIG.team.key;
-      const ek = demoMode ? CONFIG.demo.tbaEvent : CONFIG.event.key;
-      fetch(`https://www.thebluealliance.com/api/v3/team/${tk}/event/${ek}/matches`, { headers: { "X-TBA-Auth-Key": CONFIG.apis.tbaKey } })
-        .then(r => r.ok ? r.json() : null)
-        .then(d => { if (d) setTBA(d); });
-    }, 5 * 60 * 1000);
-    return () => clearInterval(t);
-  }, [tbaMatches.length, demoMode]);
-
-  const autoMatch = useMemo(() => {
-    const nx115 = (nexusData?.matches || []).filter(m => [...(m.redTeams || []), ...(m.blueTeams || [])].includes(CONFIG.team.number));
-    const tba115 = tbaMatches.filter(m => [...(m.alliances?.red?.team_keys || []), ...(m.alliances?.blue?.team_keys || [])].includes(CONFIG.team.key));
-    if (nx115.length) {
-      const active = nx115.find(m => m.status !== "Complete");
-      if (active) return parseNexusLabel(active.label);
-      const last = nx115[nx115.length - 1];
-      return last ? parseNexusLabel(last.label) : null;
-    }
-    if (tba115.length) {
-      const sorted = [...tba115].sort((a, b) => (getTS(a) || 0) - (getTS(b) || 0));
-      const next = sorted.find(m => { const ts = getTS(m); return ts && ts * 1000 > Date.now() - 15 * 60 * 1000; });
-      if (next) return { level: next.comp_level === "qm" ? "qm" : next.comp_level, num: next.match_number };
-      const last = sorted[sorted.length - 1];
-      return last ? { level: last.comp_level === "qm" ? "qm" : last.comp_level, num: last.match_number } : null;
-    }
+  const autoMatch=useMemo(()=>{
+    const nx115=(nexusData?.matches||[]).filter(m=>[...(m.redTeams||[]),...(m.blueTeams||[])].includes(TEAM_NUM));
+    const tba115=tbaMatches.filter(m=>[...(m.alliances?.red?.team_keys||[]),...(m.alliances?.blue?.team_keys||[])].includes(TEAM_KEY));
+    if(nx115.length){const active=nx115.find(m=>m.status!=="Complete");if(active)return parseNexusLabel(active.label);const last=nx115[nx115.length-1];return parseNexusLabel(last.label);}
+    if(tba115.length){const sorted=[...tba115].sort((a,b)=>(getTS(a)||0)-(getTS(b)||0));const next=sorted.find(m=>{const ts=getTS(m);return ts&&ts*1000>Date.now()-15*60*1000;});
+      if(next)return{level:next.comp_level==="qm"?"qm":next.comp_level,num:next.match_number};
+      const last=sorted[sorted.length-1];return{level:last.comp_level==="qm"?"qm":last.comp_level,num:last.match_number};}
     return null;
   }, [nexusData, tbaMatches]);
 
