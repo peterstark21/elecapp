@@ -1523,7 +1523,127 @@ function DirectorAnnouncements() {
     </div>
   );
 }
+function DirectorChecklistManager() {
+  const [items, setItems] = useState([]);
+  const [div, setDiv] = useState("elec");
+  const [text, setText] = useState("");
+  const [note, setNote] = useState("");
+  const [priority, setPriority] = useState("HIGH");
+  const [msg, setMsg] = useState("");
 
+  useEffect(() => {
+    ls(SK.dirItems).then(d => setItems(asArray(d)));
+    const t = setInterval(() => ls(SK.dirItems).then(d => setItems(asArray(d))), 10000);
+    return () => clearInterval(t);
+  }, []);
+
+  const addItem = async () => {
+    if (!text.trim()) return;
+    const newItem = {
+      id: `dir_${Date.now()}`,
+      division: div,
+      text: text.trim(),
+      note: note.trim() || null,
+      priority,
+      addedAt: Date.now(),
+    };
+    const updated = [...items, newItem];
+    setItems(updated);
+    await ss(SK.dirItems, updated);
+    setText("");
+    setNote("");
+    setMsg(`Added to ${DIVS[div].label} checklist`);
+    setTimeout(() => setMsg(""), 2000);
+  };
+
+  const removeItem = async (id) => {
+    const updated = items.filter(i => i.id !== id);
+    setItems(updated);
+    await ss(SK.dirItems, updated);
+    setMsg("Item removed from all devices");
+    setTimeout(() => setMsg(""), 2000);
+  };
+
+  const clearAll = async () => {
+    setItems([]);
+    await ss(SK.dirItems, []);
+    setMsg("All custom items cleared");
+    setTimeout(() => setMsg(""), 2000);
+  };
+
+  const iS = { width: "100%", background: "rgba(255,255,255,.05)", border: `1px solid ${T.bord}`, borderRadius: 7, padding: "7px 9px", fontSize: 13, color: T.text, outline: "none", boxSizing: "border-box" };
+
+  return (
+    <div style={{ padding: 14, paddingBottom: 32 }}>
+      <div style={{ background: T.card, border: `1px solid ${T.bord}`, borderRadius: 12, padding: 14, marginBottom: 14 }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: T.textD, marginBottom: 10, textTransform: "uppercase", letterSpacing: .5 }}>
+          Add Checklist Item to All Devices
+        </div>
+
+        <div style={{ fontSize: 10, color: T.textD, marginBottom: 3 }}>DIVISION</div>
+        <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
+          {Object.values(DIVS).map(d => (
+            <button key={d.id} onClick={() => setDiv(d.id)}
+              style={{ flex: 1, padding: "7px 4px", borderRadius: 8, border: `1px solid ${div === d.id ? d.color : T.bord}`, background: div === d.id ? `${d.color}20` : "transparent", color: div === d.id ? d.color : T.textD, fontSize: 10, fontWeight: 700, cursor: "pointer" }}>
+              {d.emoji} {d.label}
+            </button>
+          ))}
+        </div>
+
+        <div style={{ fontSize: 10, color: T.textD, marginBottom: 3 }}>PRIORITY</div>
+        <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
+          {Object.entries(PC).map(([k, v]) => (
+            <button key={k} onClick={() => setPriority(k)}
+              style={{ flex: 1, padding: "5px 4px", borderRadius: 6, border: `1px solid ${priority === k ? v.dot : T.bord}`, background: priority === k ? v.bg : "transparent", color: priority === k ? v.text : T.textD, fontSize: 9, fontWeight: 700, cursor: "pointer" }}>
+              {v.label}
+            </button>
+          ))}
+        </div>
+
+        <div style={{ fontSize: 10, color: T.textD, marginBottom: 3 }}>ITEM TEXT</div>
+        <input value={text} onChange={e => setText(e.target.value)} placeholder="e.g., Check intake belt tension" style={{ ...iS, marginBottom: 8 }} />
+
+        <div style={{ fontSize: 10, color: T.textD, marginBottom: 3 }}>NOTE (optional)</div>
+        <input value={note} onChange={e => setNote(e.target.value)} placeholder="e.g., Belt slipped in Q3" style={{ ...iS, marginBottom: 10 }} />
+
+        <button onClick={addItem} disabled={!text.trim()}
+          style={{ width: "100%", background: text.trim() ? T.pur : "rgba(126,34,206,.2)", color: text.trim() ? "white" : T.textD, border: "none", borderRadius: 8, padding: "10px", fontWeight: 700, fontSize: 13, cursor: text.trim() ? "pointer" : "default" }}>
+          Add to {DIVS[div].label} Checklist
+        </button>
+        {msg && <div style={{ fontSize: 12, color: T.green, marginTop: 6 }}>{msg}</div>}
+      </div>
+
+      {items.length > 0 && (
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: T.textD, textTransform: "uppercase", letterSpacing: .5 }}>
+              Custom Items ({items.length})
+            </div>
+            <button onClick={clearAll} style={{ fontSize: 11, color: T.red, background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}>Clear All</button>
+          </div>
+          {items.map(item => {
+            const dv = DIVS[item.division] || DIVS.elec;
+            return (
+              <div key={item.id} style={{ background: T.card, border: `1px solid ${T.bord}`, borderRadius: 10, padding: "10px 12px", marginBottom: 8, display: "flex", gap: 10, alignItems: "flex-start" }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap", marginBottom: 4 }}>
+                    <span style={{ fontSize: 11, background: `${dv.color}20`, color: dv.color, padding: "1px 7px", borderRadius: 99, fontWeight: 700 }}>{dv.emoji} {dv.label}</span>
+                    <Badge p={item.priority} />
+                  </div>
+                  <div style={{ fontSize: 13, color: T.text, lineHeight: 1.4 }}>{item.text}</div>
+                  {item.note && <div style={{ fontSize: 11, color: T.textD, marginTop: 2 }}>{"\u27A4"} {item.note}</div>}
+                  <div style={{ fontSize: 10, color: T.textD, marginTop: 3 }}>Added {fmtDT(item.addedAt)}</div>
+                </div>
+                <button onClick={() => removeItem(item.id)} style={{ background: "none", border: "none", cursor: "pointer", color: T.red, fontSize: 16, flexShrink: 0 }}>{"\u2715"}</button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+      {items.length === 0 && <div style={{ textAlign: "center", padding: 24, color: T.textD, fontSize: 13 }}>No custom checklist items. Add items above and they'll appear in all lead checklists instantly.</div>}
+    </div>
+  );
+}
 function DirectorIssues() {
   const [issues, setIssues] = useState([]);
   const [match, setMatch] = useState("");
