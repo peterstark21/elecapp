@@ -871,7 +871,7 @@ function MatchIntelPanel({ autoMatch, nexusData, tbaMatches }) {
 function ChecklistTab({div,nexusData,tbaMatches,autoMatch,demoMode}){
   const {hidden}=useHiddenItems();
   const sections=filterSections(div,hidden);
-  const allItems=getAllItems(div,hidden);
+  const allItems=getAllItemsStatic(div,hidden);
   const allIds=allItems.map(i=>i.id);
   const critItems=getCritItems(div,hidden);
   const divCfg=DIVS[div];
