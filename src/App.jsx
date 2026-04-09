@@ -8,17 +8,17 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from "react"
 const CONFIG = {
   team: { number: "115", key: "frc115", name: "MVRT" },
   event: {
-    key: "2026caoec",
-    name: "2026 OC District",
-    dates: "April 2–4, 2026",
-    location: "Capistrano Valley HS",
-    startISO: "2026-04-02T07:00:00-07:00",
+    key: "2026cancmp",
+    name: "2026 NorCal District Championship",
+    dates: "April 9–12, 2026",
+    location: "Cow Palace, Daly City",
+    startISO: "2026-04-09T07:00:00-07:00",
   },
   demo: { tbaEvent: "2025capin", tbaTeam: "frc115" },
   apis: {
     tbaKey: "CeAknKFak2QzpNHDnlx5k7l28hIqe6JwLywSYXtAMPiNPnyxHMyf7awc5Qowl5Z0",
     nexusKey: "rVnKYGMmwYp7N-GlkYvywj0_iPs",
-    nexusEvent: "2026caoec",
+    nexusEvent: "2026cancmp",
   },
   email: {
     serviceId: "service_4ssfaza",
@@ -415,7 +415,9 @@ function findQueueTrigger(nx=[],ourM){if(!ourM)return null;
 function bestMatchTime(nxM,tbaM){
   if(nxM?.times?.estimatedStartTime)return nxM.times.estimatedStartTime;
   const t=getTS(tbaM);return t?t*1000:null;}
-function bestQueueTime(trigNx,ourMs){
+function bestQueueTime(trigNx,ourMs,nxM){
+  // Prefer Nexus's own estimatedQueueTime for our match — this matches frc.nexus exactly
+  if(nxM?.times?.estimatedQueueTime)return nxM.times.estimatedQueueTime;
   if(trigNx?.times?.estimatedStartTime)return trigNx.times.estimatedStartTime;
   return ourMs?ourMs-10*60*1000:null;}
 function getAlliances(nxM,tbaM){
@@ -834,7 +836,7 @@ function MatchIntelPanel({ autoMatch, nexusData, tbaMatches }) {
 
   const ts = bestMatchTime(nxM, tbaM);
   const trigNx = nxM ? findQueueTrigger(nexusData?.matches || [], nxM) : null;
-  const qMs = bestQueueTime(trigNx, ts);
+  const qMs = bestQueueTime(trigNx, ts, nxM);
   const diffMs = qMs ? qMs - now : null;
   const passed = diffMs !== null && diffMs < 0;
   const urgent = diffMs !== null && diffMs >= 0 && diffMs < 90000;
@@ -1050,7 +1052,7 @@ function ScheduleTab({nexusData,tbaMatches,onFetch,loading,error}){
       </div>);
     const ts=bestMatchTime(nxM,tbaM);
     const trig=nxM?findQueueTrigger(nexusData?.matches||[],nxM):null;
-    const qMs=bestQueueTime(trig,ts);const diffMs=qMs?qMs-now:null;
+    const qMs=bestQueueTime(trig,ts,nxM);const diffMs=qMs?qMs-now:null;
     const passed=diffMs!==null&&diffMs<0,urgent=diffMs!==null&&diffMs>=0&&diffMs<90000;
     const al=getAlliances(nxM,tbaM);const ss2=nxM?nexusSS(nxM.status):null;
     const lbl=nxM?.label||mLbl(tbaM);
@@ -1099,7 +1101,7 @@ function ScheduleTab({nexusData,tbaMatches,onFetch,loading,error}){
         const isNx=!!m.label;const ts=isNx?bestMatchTime(m,null):(getTS(m)||0)*1000;
         const passed=ts&&ts<now-120000;const al=getAlliances(isNx?m:null,isNx?null:m);
         const trig=isNx?findQueueTrigger(nexusData?.matches||[],m):null;
-        const qMs=bestQueueTime(trig,ts);const diffMs=qMs?qMs-now:null;
+        const qMs=bestQueueTime(trig,ts,isNx?m:null);const diffMs=qMs?qMs-now:null;
         const soon=diffMs!==null&&diffMs>=0&&diffMs<90000;
         const ss2=isNx?nexusSS(m.status):null;const label=isNx?m.label:mLbl(m);
         return(<div key={idx} style={{borderRadius:8,border:`1px solid ${soon?"#fca5a5":T.bord}`,background:soon?"#fef2f2":passed?"rgba(255,255,255,.02)":"rgba(255,255,255,.04)",marginBottom:8}}>
@@ -1263,7 +1265,7 @@ function LivestreamTab() {
         ) : (
           <div style={{ padding: "40px 20px", textAlign: "center" }}>
             <div style={{ fontSize: 48, marginBottom: 8 }}>{"\u25B6\uFE0F"}</div>
-            <div style={{ fontWeight: 700, fontSize: 16, color: T.text, marginBottom: 8 }}>OC District Livestream</div>
+            <div style={{ fontWeight: 700, fontSize: 16, color: T.text, marginBottom: 8 }}>NorCal DCMP Livestream</div>
             <button onClick={() => setOpen(true)} style={{ background: T.pur, color: "white", border: "none", borderRadius: 10, padding: "12px 24px", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>Watch Live</button>
           </div>
         )}
