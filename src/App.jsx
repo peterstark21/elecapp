@@ -31,7 +31,7 @@ const CONFIG = {
     token: "gQAAAAAAAT4pAAIncDFmNThjN2Y3OGZhZmI0YTBhYmNiMzJmZDE3N2NiMjNlYXAxODE0NDk",
   },
   defaultPin: "1028",
-  youtubeStreamUrl: "https://www.youtube.com/watch?v=zs_AxRJusy0", // paste YouTube livestream URL when available
+  youtubeStreamUrl: "https://www.youtube.com/watch?v=NQUe8VRXmwk", // paste YouTube livestream URL when available
 };
 
 const TEAM_NUM = CONFIG.team.number;
